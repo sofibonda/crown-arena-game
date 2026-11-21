@@ -4,14 +4,12 @@
 <meta charset="utf-8">
 <title>Crown Arena 3D</title>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
 html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#1a2238;font-family:'Fredoka',system-ui,-apple-system,sans-serif;color:#fff;touch-action:none}
 canvas{display:block;width:100%;height:100%}
 
-/* HUD */
 #hud{position:fixed;inset:0;pointer-events:none;z-index:3;display:none}
 .top-bar{position:absolute;top:12px;left:12px;right:12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
 .pill{background:rgba(18,24,42,.85);border:2px solid rgba(255,255,255,.16);border-radius:14px;padding:6px 14px;display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;box-shadow:0 4px 14px rgba(0,0,0,.35);backdrop-filter:blur(6px)}
@@ -33,17 +31,14 @@ canvas{display:block;width:100%;height:100%}
 #boss-bar{height:14px;background:rgba(20,10,15,.88);border:2px solid #f87171;border-radius:99px;overflow:hidden}
 #boss-fill{height:100%;width:100%;background:linear-gradient(90deg,#dc2626,#f97316)}
 
-/* Dash Button (Mobile & Desktop) */
 #dash-btn{pointer-events:auto;position:absolute;right:24px;bottom:24px;width:68px;height:68px;border-radius:50%;border:3px solid #38bdf8;background:rgba(15,23,42,.88);color:#fff;font-family:inherit;font-weight:700;font-size:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 18px rgba(56,189,248,.35);transition:transform .1s,opacity .15s}
 #dash-btn:active{transform:scale(.92)}
 #dash-btn.cd{opacity:.45;border-color:#64748b}
 
-/* Virtual Joystick */
 #joy{position:fixed;width:116px;height:116px;border-radius:50%;border:2px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);pointer-events:none;display:none;z-index:4;transform:translate(-50%,-50%)}
 #joy-knob{position:absolute;left:50%;top:50%;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.55);transform:translate(-50%,-50%);box-shadow:0 2px 10px rgba(0,0,0,.3)}
 
-/* Overlays */
-.overlay{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:16px;background:radial-gradient(circle at center,rgba(20,28,50,.55),rgba(10,14,26,.88));backdrop-filter:blur(5px)}
+.overlay{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:16px;background:radial-gradient(circle at center,rgba(20,28,50,.45),rgba(10,14,26,.82));backdrop-filter:blur(3px)}
 .card{background:linear-gradient(180deg,#232d4b,#171e34);border:2px solid rgba(255,255,255,.16);border-radius:24px;padding:24px;max-width:520px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.55)}
 h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:linear-gradient(180deg,#fff,#fde047);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 3px 0 rgba(0,0,0,.45))}
 .sub{color:#cbd5e1;font-size:15px;margin:0 0 18px}
@@ -59,12 +54,10 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
 
 .ad-badge{background:#111827;color:#fde047;font-size:11px;padding:2px 6px;border-radius:6px;letter-spacing:.5px}
 
-/* Lobby Grid */
 .lobby-stats{display:flex;justify-content:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
 .stat-box{background:rgba(12,17,32,.7);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:7px 14px;font-size:14px}
 .lobby-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 
-/* Upgrade Shop & Skins */
 .grid-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;max-height:52vh;overflow-y:auto;padding-right:2px}
 .upg-item{background:rgba(13,18,34,.8);border:2px solid rgba(255,255,255,.1);border-radius:16px;padding:10px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;gap:8px}
 .upg-top{display:flex;align-items:center;gap:8px}
@@ -72,7 +65,6 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
 .upg-title{font-weight:700;font-size:14px;line-height:1.15}
 .upg-lvl{font-size:12px;color:#94a3b8}
 
-/* Level-Up Cards */
 .lvl-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
 @media(max-width:560px){.lvl-cards{grid-template-columns:1fr}}
 .pick-card{cursor:pointer;background:linear-gradient(180deg,#2c395e,#1c2540);border:2px solid rgba(255,255,255,.2);border-radius:18px;padding:14px 10px;transition:transform .14s,border-color .14s,box-shadow .14s;display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -81,12 +73,6 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
 .pick-name{font-weight:700;font-size:16px;color:#fde047}
 .pick-desc{font-size:13px;color:#cbd5e1;line-height:1.25}
 
-/* Simulated Ad Overlay */
-#mock-ad{position:fixed;inset:0;z-index:50;background:#090d16;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
-.spinner{width:46px;height:46px;border:5px solid rgba(255,255,255,.15);border-top-color:#fde047;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:14px}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* Floating Damage Numbers */
 #dmg-layer{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden}
 .dmg-num{position:absolute;font-weight:700;font-size:17px;text-shadow:0 2px 4px #000;transform:translate(-50%,-50%);animation:floatUp .65s ease-out forwards}
 @keyframes floatUp{0%{opacity:1;transform:translate(-50%,-50%) scale(.75)}30%{transform:translate(-50%,-95%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-170%) scale(.9)}}
@@ -96,7 +82,6 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
 
 <div id="dmg-layer"></div>
 
-<!-- ACTIVE HUD -->
 <div id="hud">
   <div class="top-bar">
     <div style="display:flex;gap:8px;align-items:center">
@@ -125,10 +110,8 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
   <button id="dash-btn" title="Dash [Space / Shift]"><span style="font-size:20px">💨</span>DASH</button>
 </div>
 
-<!-- VIRTUAL JOYSTICK -->
 <div id="joy"><div id="joy-knob"></div></div>
 
-<!-- MAIN LOBBY OVERLAY -->
 <div class="overlay" id="ov-lobby">
   <div class="card">
     <h1>CROWN ARENA 3D</h1>
@@ -146,13 +129,12 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
       <button class="btn btn-purple btn-sm" id="btn-open-skins">👑 HEROES</button>
     </div>
     <button class="btn btn-green btn-sm" id="btn-free-gold" style="width:100%;margin-top:10px">
-      🎁 +150 GOLD <span class="ad-badge">AD</span>
+      🎁 +150 GOLD <span class="ad-badge">BONUS</span>
     </button>
     <div style="margin-top:12px;font-size:12px;color:#94a3b8">WASD / Drag to move • Auto-Slash &amp; Homing Bolts • Space: Dash</div>
   </div>
 </div>
 
-<!-- UPGRADES MODAL -->
 <div class="overlay" id="ov-upg" style="display:none">
   <div class="card">
     <h2 style="margin:0;font-size:26px">⚡ PERMANENT UPGRADES</h2>
@@ -162,7 +144,6 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
   </div>
 </div>
 
-<!-- SKINS MODAL -->
 <div class="overlay" id="ov-skins" style="display:none">
   <div class="card">
     <h2 style="margin:0;font-size:26px">👑 SELECT HERO</h2>
@@ -172,7 +153,6 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
   </div>
 </div>
 
-<!-- LEVEL UP MODAL -->
 <div class="overlay" id="ov-lvl" style="display:none">
   <div class="card" style="max-width:620px">
     <h2 style="margin:0;font-size:28px;color:#fde047">✨ LEVEL UP!</h2>
@@ -181,7 +161,6 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
   </div>
 </div>
 
-<!-- PAUSE MODAL -->
 <div class="overlay" id="ov-pause" style="display:none">
   <div class="card" style="max-width:360px">
     <h2 style="margin:0 0 14px;font-size:28px">⏸️ PAUSED</h2>
@@ -190,7 +169,6 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
   </div>
 </div>
 
-<!-- GAME OVER MODAL -->
 <div class="overlay" id="ov-over" style="display:none">
   <div class="card" style="max-width:440px">
     <h2 style="margin:0 0 6px;font-size:32px;color:#f87171">DEFEATED</h2>
@@ -202,25 +180,16 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
     </div>
 
     <button class="btn btn-green" id="btn-revive" style="width:100%;margin-bottom:10px">
-      ❤️ REVIVE (60% HP) <span class="ad-badge">AD</span>
+      ❤️ REVIVE (60% HP)
     </button>
     <button class="btn btn-purple" id="btn-double" style="width:100%;margin-bottom:10px">
-      🪙 CLAIM 2X GOLD <span class="ad-badge">AD</span>
+      🪙 CLAIM 2X GOLD
     </button>
     <button class="btn btn-blue" id="btn-again" style="width:100%">🔄 PLAY AGAIN</button>
   </div>
 </div>
 
-<!-- MOCK AD FALLBACK -->
-<div id="mock-ad">
-  <div class="spinner"></div>
-  <div style="font-size:20px;font-weight:700;color:#fde047" id="mock-ad-title">CrazyGames Ad Break...</div>
-  <div style="font-size:13px;color:#94a3b8;margin-top:6px">On CrazyGames portal, a real video ad plays here</div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<!-- OPTIONAL: Uncomment below when swapping in external .glb 3D models! -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" onerror="var s=document.createElement('script');s.src='https://unpkg.com/three@0.128.0/build/three.min.js';document.head.appendChild(s)"></script>
 <script>
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -230,103 +199,9 @@ const fmtTime = s => {
   return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
 };
 
-/* =========================================================
-   ASSET CONFIG — DROP EXTERNAL .GLB MODELS HERE ANYTIME!
-   Leave URLs as null to use built-in procedural 3D characters.
-   ========================================================= */
-const EXTERNAL_MODELS = {
-  heroUrl: null,   // e.g. 'assets/knight.glb'
-  goblinUrl: null, // e.g. 'assets/goblin.glb'
-  bruteUrl: null,  // e.g. 'assets/ogre.glb'
-  bossUrl: null    // e.g. 'assets/titan_boss.glb'
-};
-
-/* =========================================================
-   1. CRAZYGAMES SDK v3 INTEGRATION
-   ========================================================= */
-const CG = {
-  ready: false,
-  sdk: null,
-  gameplayActive: false,
-  async init() {
-    try {
-      if (window.CrazyGames && window.CrazyGames.SDK) {
-        this.sdk = window.CrazyGames.SDK;
-        await this.sdk.init();
-        this.ready = true;
-      }
-    } catch (e) { this.ready = false; }
-  },
-  gameplayStart() {
-    if (this.gameplayActive) return;
-    this.gameplayActive = true;
-    try { if (this.ready) this.sdk.game.gameplayStart(); } catch (_) {}
-  },
-  gameplayStop() {
-    if (!this.gameplayActive) return;
-    this.gameplayActive = false;
-    try { if (this.ready) this.sdk.game.gameplayStop(); } catch (_) {}
-  },
-  happytime() {
-    try { if (this.ready) this.sdk.game.happytime(); } catch (_) {}
-  },
-  saveData(key, val) {
-    try { localStorage.setItem(key, JSON.stringify(val)); } catch (_) {}
-    try { if (this.ready && this.sdk.data) this.sdk.data.setItem(key, JSON.stringify(val)); } catch (_) {}
-  },
-  loadData(key, fallback) {
-    try {
-      if (this.ready && this.sdk.data) {
-        const v = this.sdk.data.getItem(key);
-        if (v !== null && v !== undefined) return JSON.parse(v);
-      }
-    } catch (_) {}
-    try {
-      const v = localStorage.getItem(key);
-      if (v !== null) return JSON.parse(v);
-    } catch (_) {}
-    return fallback;
-  },
-  requestAd(type, onReward, onDone) {
-    const wasPlaying = state.mode === 'play';
-    if (wasPlaying) this.gameplayStop();
-    state.adPlaying = true;
-    AudioSys.setAdMute(true);
-
-    const finish = (rewarded) => {
-      state.adPlaying = false;
-      AudioSys.setAdMute(false);
-      if (rewarded && onReward) onReward();
-      if (onDone) onDone();
-    };
-
-    if (this.ready && this.sdk.ad) {
-      try {
-        this.sdk.ad.requestAd(type, {
-          adStarted: () => {},
-          adFinished: () => finish(true),
-          adError: () => finish(false)
-        });
-        return;
-      } catch (_) {}
-    }
-
-    $('mock-ad-title').textContent = type === 'rewarded' ? 'Rewarded Video Ad (Preview)...' : 'Midgame Ad Break (Preview)...';
-    $('mock-ad').style.display = 'flex';
-    setTimeout(() => {
-      $('mock-ad').style.display = 'none';
-      finish(true);
-    }, 1000);
-  }
-};
-
-/* =========================================================
-   2. PROCEDURAL WEB AUDIO SYNTHESIZER
-   ========================================================= */
 const AudioSys = {
   ctx: null,
   muted: false,
-  adMuted: false,
   gemCombo: 0,
   gemTimer: 0,
   init() {
@@ -334,16 +209,15 @@ const AudioSys = {
       const AC = window.AudioContext || window.webkitAudioContext;
       if (AC) this.ctx = new AC();
     }
-    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+    if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume().catch(() => {});
   },
   setMuted(m) {
     this.muted = m;
     $('btn-mute').textContent = m ? '🔇' : '🔊';
     saveProgress();
   },
-  setAdMute(m) { this.adMuted = m; },
   play(freq, dur = 0.12, type = 'sine', vol = 0.12, slide = 0) {
-    if (this.muted || this.adMuted || !this.ctx) return;
+    if (this.muted || !this.ctx) return;
     const t = this.ctx.currentTime;
     const o = this.ctx.createOscillator();
     const g = this.ctx.createGain();
@@ -373,9 +247,6 @@ const AudioSys = {
   boss() { [140, 110, 95].forEach((f, i) => setTimeout(() => this.play(f, 0.35, 'sawtooth', 0.14), i * 180)); }
 };
 
-/* =========================================================
-   3. PERSISTENT PROGRESSION DATA
-   ========================================================= */
 const UPGRADES_DEF = [
   { id: 'hp', name: 'Vitality', ico: '❤️', desc: '+25 Max HP', base: 60, scale: 1.45, max: 10 },
   { id: 'dmg', name: 'Power', ico: '⚔️', desc: '+15% Damage', base: 75, scale: 1.5, max: 10 },
@@ -403,56 +274,49 @@ let save = {
 };
 
 function loadProgress() {
-  const loaded = CG.loadData('crown_arena_save_v2', null);
-  if (loaded) save = { ...save, ...loaded, upg: { ...save.upg, ...(loaded.upg || {}) } };
+  try {
+    const raw = localStorage.getItem('crown_arena_save_v2');
+    if (raw) {
+      const loaded = JSON.parse(raw);
+      save = { ...save, ...loaded, upg: { ...save.upg, ...(loaded.upg || {}) } };
+    }
+  } catch (_) {}
   AudioSys.setMuted(!!save.muted);
 }
 function saveProgress() {
   save.muted = AudioSys.muted;
-  CG.saveData('crown_arena_save_v2', save);
+  try { localStorage.setItem('crown_arena_save_v2', JSON.stringify(save)); } catch (_) {}
 }
 
-/* =========================================================
-   4. THREE.JS 3D SCENE & ARENA
-   ========================================================= */
-const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-document.body.prepend(renderer.domElement);
-
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x1b263b);
-scene.fog = new THREE.Fog(0x1b263b, 32, 74);
-
-const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.5, 120);
-camera.position.set(0, 20, 18);
-
-scene.add(new THREE.HemisphereLight(0x93c5fd, 0x334155, 0.9));
-const dirLight = new THREE.DirectionalLight(0xfff1d0, 1.25);
-dirLight.position.set(18, 30, 16);
-dirLight.castShadow = true;
-dirLight.shadow.mapSize.set(1024, 1024);
-dirLight.shadow.camera.left = dirLight.shadow.camera.bottom = -26;
-dirLight.shadow.camera.right = dirLight.shadow.camera.top = 26;
-dirLight.shadow.bias = -0.001;
-scene.add(dirLight);
-
-const toonGrad = new THREE.DataTexture(new Uint8Array([95, 175, 255]), 3, 1, THREE.LuminanceFormat);
-toonGrad.minFilter = toonGrad.magFilter = THREE.NearestFilter;
-toonGrad.needsUpdate = true;
-const toonMat = (color, extra = {}) => new THREE.MeshToonMaterial({ color, gradientMap: toonGrad, ...extra });
-const outlineMat = new THREE.MeshBasicMaterial({ color: 0x0f172a, side: THREE.BackSide });
-function addOutline(mesh, scale = 1.07) {
-  const hull = new THREE.Mesh(mesh.geometry, outlineMat);
-  hull.scale.setScalar(scale);
-  mesh.add(hull);
-  return mesh;
-}
-
+let renderer, scene, camera, heroGroup, targetRing, slashArc, bladesGroup, heroRig = null;
 const ARENA_R = 22;
-{
+
+function initThree() {
+  if (!window.THREE) return false;
+  renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  document.body.prepend(renderer.domElement);
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x1b263b);
+  scene.fog = new THREE.Fog(0x1b263b, 32, 74);
+
+  camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.5, 120);
+  camera.position.set(0, 20, 18);
+
+  scene.add(new THREE.HemisphereLight(0x93c5fd, 0x334155, 0.95));
+  const dirLight = new THREE.DirectionalLight(0xfff1d0, 1.25);
+  dirLight.position.set(18, 30, 16);
+  dirLight.castShadow = true;
+  dirLight.shadow.mapSize.set(1024, 1024);
+  dirLight.shadow.camera.left = dirLight.shadow.camera.bottom = -26;
+  dirLight.shadow.camera.right = dirLight.shadow.camera.top = 26;
+  dirLight.shadow.bias = -0.001;
+  scene.add(dirLight);
+
   const c = document.createElement('canvas');
   c.width = c.height = 512;
   const ctx = c.getContext('2d');
@@ -500,37 +364,46 @@ const ARENA_R = 22;
     brazier.position.set(px, 3.35, pz);
     scene.add(brazier);
   }
+
+  heroGroup = new THREE.Group();
+  scene.add(heroGroup);
+
+  targetRing = new THREE.Mesh(
+    new THREE.RingGeometry(0.65, 0.9, 24),
+    new THREE.MeshBasicMaterial({ color: 0xfacc15, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
+  );
+  targetRing.rotation.x = -Math.PI / 2;
+  targetRing.position.y = 0.05;
+  targetRing.visible = false;
+  scene.add(targetRing);
+
+  slashArc = new THREE.Mesh(
+    new THREE.RingGeometry(1.1, 3.6, 24, 1, -Math.PI * 0.42, Math.PI * 0.84),
+    new THREE.MeshBasicMaterial({ color: 0xfef08a, side: THREE.DoubleSide, transparent: true, opacity: 0 })
+  );
+  slashArc.rotation.x = -Math.PI / 2;
+  slashArc.position.y = 0.9;
+  heroGroup.add(slashArc);
+
+  bladesGroup = new THREE.Group();
+  scene.add(bladesGroup);
+
+  buildHeroModel();
+  return true;
 }
 
-/* =========================================================
-   5. ARTICULATED 3D CHARACTER BUILDER & ANIMATION SYSTEM
-   ========================================================= */
-const heroGroup = new THREE.Group();
-scene.add(heroGroup);
-
-// Target Indicator Ring under nearest locked enemy
-const targetRing = new THREE.Mesh(
-  new THREE.RingGeometry(0.65, 0.9, 24),
-  new THREE.MeshBasicMaterial({ color: 0xfacc15, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
-);
-targetRing.rotation.x = -Math.PI / 2;
-targetRing.position.y = 0.05;
-targetRing.visible = false;
-scene.add(targetRing);
-
-// Glowing 3D Sword Slash Arc Effect
-const slashArc = new THREE.Mesh(
-  new THREE.RingGeometry(1.1, 3.6, 24, 1, -Math.PI * 0.42, Math.PI * 0.84),
-  new THREE.MeshBasicMaterial({ color: 0xfef08a, side: THREE.DoubleSide, transparent: true, opacity: 0 })
-);
-slashArc.rotation.x = -Math.PI / 2;
-slashArc.position.y = 0.9;
-heroGroup.add(slashArc);
-
-let heroRig = null;
+const toonMat = (color, extra = {}) => new THREE.MeshToonMaterial({ color, ...extra });
+const outlineMat = new THREE.MeshBasicMaterial({ color: 0x0f172a, side: THREE.BackSide });
+function addOutline(mesh, scale = 1.07) {
+  const hull = new THREE.Mesh(mesh.geometry, outlineMat);
+  hull.scale.setScalar(scale);
+  mesh.add(hull);
+  return mesh;
+}
 
 function buildHeroModel() {
-  while (heroGroup.children.length > 1) heroGroup.remove(heroGroup.children[1]); // keep slashArc at index 0
+  if (!heroGroup) return;
+  while (heroGroup.children.length > 1) heroGroup.remove(heroGroup.children[1]);
   const sk = SKINS_DEF.find(s => s.id === save.skin) || SKINS_DEF[0];
   const bodyMat = toonMat(sk.body);
   const trimMat = toonMat(sk.trim);
@@ -541,7 +414,6 @@ function buildHeroModel() {
   const root = new THREE.Group();
   heroGroup.add(root);
 
-  // Articulated Legs
   const legs = [-0.18, 0.18].map(x => {
     const piv = new THREE.Group();
     piv.position.set(x, 0.56, 0);
@@ -556,7 +428,6 @@ function buildHeroModel() {
     return piv;
   });
 
-  // Torso + Armor Belt + Flowing Cape
   const torso = new THREE.Group();
   torso.position.y = 0.56;
   root.add(torso);
@@ -578,7 +449,6 @@ function buildHeroModel() {
   capePivot.add(cape);
   torso.add(capePivot);
 
-  // Head + Crown + Eyes
   const head = addOutline(new THREE.Mesh(new THREE.SphereGeometry(0.38, 16, 14), skinMat));
   head.position.y = 1.12;
   head.castShadow = true;
@@ -594,7 +464,6 @@ function buildHeroModel() {
     torso.add(eye);
   }
 
-  // Left Arm (Shield / Balance)
   const leftArm = new THREE.Group();
   leftArm.position.set(-0.48, 0.68, 0);
   const lMesh = addOutline(new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.1, 0.52, 10), bodyMat));
@@ -606,7 +475,6 @@ function buildHeroModel() {
   leftArm.add(shield);
   torso.add(leftArm);
 
-  // Right Arm (Weapon Swing Pivot + Glowing Broadsword)
   const rightArm = new THREE.Group();
   rightArm.position.set(0.48, 0.68, 0);
   const rMesh = addOutline(new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.1, 0.52, 10), bodyMat));
@@ -626,12 +494,9 @@ function buildHeroModel() {
 
   heroRig = { root, torso, legs, leftArm, rightArm, capePivot, swingTimer: 0, walkPhase: 0 };
 }
-buildHeroModel();
 
-// Orbiting Blades Group
-const bladesGroup = new THREE.Group();
-scene.add(bladesGroup);
 function syncOrbitBlades(count) {
+  if (!bladesGroup) return;
   while (bladesGroup.children.length) bladesGroup.remove(bladesGroup.children[0]);
   for (let i = 0; i < count; i++) {
     const a = (i / count) * Math.PI * 2;
@@ -643,12 +508,8 @@ function syncOrbitBlades(count) {
   }
 }
 
-/* =========================================================
-   6. GAMEPLAY STATE & LEVEL-UP POWERS
-   ========================================================= */
 const state = {
   mode: 'lobby',
-  adPlaying: false,
   time: 0,
   kills: 0,
   runGold: 0,
@@ -672,6 +533,7 @@ const state = {
   dashTime: 0,
   dashDirX: 0,
   dashDirZ: 1,
+  hurtCD: 0,
   revived: false,
   doubled: false,
   nextBossTime: 50,
@@ -695,9 +557,6 @@ const RUN_POWERS = [
   { id: 'crit', ico: '🎯', name: 'Critical Edge', desc: '+15% Critical Hit Chance (2.2x DMG)', apply: () => state.critChance = Math.min(0.85, state.critChance + 0.15) }
 ];
 
-/* =========================================================
-   7. UI & MODAL HANDLERS
-   ========================================================= */
 function refreshLobbyUI() {
   $('lob-gold').textContent = save.gold;
   $('lob-best').textContent = fmtTime(save.bestTime);
@@ -773,7 +632,6 @@ window.selectOrBuySkin = id => {
     if (save.gold < s.cost) return;
     save.gold -= s.cost;
     save.skins.push(id);
-    CG.happytime();
     AudioSys.lvlUp();
   } else { AudioSys.gold(); }
   save.skin = id;
@@ -790,25 +648,21 @@ $('btn-close-skins').onclick = () => { $('ov-skins').style.display = 'none'; };
 
 $('btn-free-gold').onclick = () => {
   AudioSys.init();
-  CG.requestAd('rewarded', () => {
-    save.gold += 150;
-    saveProgress();
-    AudioSys.gold();
-    refreshLobbyUI();
-  });
+  save.gold += 150;
+  saveProgress();
+  AudioSys.gold();
+  refreshLobbyUI();
 };
 
 $('btn-mute').onclick = () => { AudioSys.init(); AudioSys.setMuted(!AudioSys.muted); };
 $('btn-pause').onclick = () => {
   if (state.mode !== 'play') return;
   state.mode = 'pause';
-  CG.gameplayStop();
   $('ov-pause').style.display = 'flex';
 };
 $('btn-resume').onclick = () => {
   $('ov-pause').style.display = 'none';
   state.mode = 'play';
-  CG.gameplayStart();
 };
 $('btn-quit').onclick = () => {
   $('ov-pause').style.display = 'none';
@@ -820,26 +674,24 @@ function triggerDash() {
   state.dashTime = 0.2;
   state.dashCD = 1.6;
   AudioSys.dash();
-  spawnBurst(heroGroup.position, 0x38bdf8, 8);
+  if (heroGroup) spawnBurst(heroGroup.position, 0x38bdf8, 8);
 }
 $('dash-btn').onclick = triggerDash;
 
-/* =========================================================
-   8. RUN START, LEVEL UP, REVIVE & GAME OVER
-   ========================================================= */
 function clearEntities() {
   [enemies, bullets, enemyShots, gems, particles].forEach(arr => {
     while (arr.length) {
       const it = arr.pop();
-      if (it.mesh) scene.remove(it.mesh);
+      if (it.mesh && scene) scene.remove(it.mesh);
     }
   });
   syncOrbitBlades(0);
-  targetRing.visible = false;
+  if (targetRing) targetRing.visible = false;
 }
 
 function startRun() {
   AudioSys.init();
+  if (!scene && !initThree()) return;
   clearEntities();
 
   state.time = 0;
@@ -864,6 +716,7 @@ function startRun() {
   state.critChance = 0.12;
   state.dashCD = 0;
   state.dashTime = 0;
+  state.hurtCD = 0;
   state.revived = false;
   state.doubled = false;
   state.nextBossTime = 50;
@@ -875,31 +728,28 @@ function startRun() {
   $('ov-lobby').style.display = 'none';
   $('ov-over').style.display = 'none';
   $('ov-lvl').style.display = 'none';
+  $('ov-pause').style.display = 'none';
   $('boss-bar-wrap').style.display = 'none';
   $('hud').style.display = 'block';
 
   state.mode = 'play';
-  CG.gameplayStart();
-
-  // Spawn close starter enemies so action begins immediately
-  for (let i = 0; i < 5; i++) spawnEnemy('goblin', 11 + i * 1.5);
+  for (let i = 0; i < 5; i++) spawnEnemy('goblin', 10 + i * 1.4);
+  spawnEnemy('imp', 13);
 }
 
 function returnToLobby() {
   clearEntities();
   state.mode = 'lobby';
-  CG.gameplayStop();
   $('hud').style.display = 'none';
   $('ov-over').style.display = 'none';
+  $('ov-pause').style.display = 'none';
   $('ov-lobby').style.display = 'flex';
   refreshLobbyUI();
 }
 
 function triggerLevelUp() {
   state.mode = 'levelup';
-  CG.gameplayStop();
   AudioSys.lvlUp();
-
   const pool = [...RUN_POWERS].sort(() => Math.random() - 0.5).slice(0, 3);
   $('lvl-cards').innerHTML = pool.map(p => `
     <div class="pick-card" onclick="pickPower('${p.id}')">
@@ -916,18 +766,30 @@ window.pickPower = id => {
   if (p) p.apply();
   $('ov-lvl').style.display = 'none';
   state.mode = 'play';
-  CG.gameplayStart();
 };
+
+function damagePlayer(rawDmg) {
+  if (state.mode !== 'play' || state.dashTime > 0 || state.hurtCD > 0) return;
+  const armorMult = Math.max(0.4, 1 - (save.upg.armor || 0) * 0.06);
+  const dmg = Math.max(1, rawDmg * armorMult);
+  state.hp -= dmg;
+  state.hurtCD = 0.25;
+  state.shake = Math.max(state.shake, 0.2);
+  AudioSys.hurt();
+  if (heroGroup) spawnFloatingText(heroGroup.position.clone().add(new THREE.Vector3(0, 1.8, 0)), `-${Math.ceil(dmg)}`, '#f87171');
+  if (state.hp <= 0) {
+    state.hp = 0;
+    triggerGameOver();
+  }
+}
 
 function triggerGameOver() {
   state.mode = 'over';
-  CG.gameplayStop();
   AudioSys.hurt();
 
   let newRecord = false;
   if (state.time > save.bestTime) { save.bestTime = Math.floor(state.time); newRecord = true; }
   if (state.kills > save.bestKills) { save.bestKills = state.kills; newRecord = true; }
-  if (newRecord) CG.happytime();
 
   save.gold += state.runGold;
   saveProgress();
@@ -945,42 +807,39 @@ function triggerGameOver() {
 $('btn-play').onclick = startRun;
 
 $('btn-revive').onclick = () => {
-  CG.requestAd('rewarded', () => {
-    state.revived = true;
-    state.hp = Math.round(state.maxHp * 0.6);
-    for (let i = enemies.length - 1; i >= 0; i--) {
-      const e = enemies[i];
-      if (e.mesh.position.distanceTo(heroGroup.position) < 10 && !e.isBoss) {
-        spawnBurst(e.mesh.position, 0x38bdf8, 8);
-        scene.remove(e.mesh);
-        enemies.splice(i, 1);
-      }
+  state.revived = true;
+  state.hp = Math.round(state.maxHp * 0.6);
+  state.hurtCD = 0.8;
+  for (let i = enemies.length - 1; i >= 0; i--) {
+    const e = enemies[i];
+    if (heroGroup && e.mesh.position.distanceTo(heroGroup.position) < 10 && !e.isBoss) {
+      spawnBurst(e.mesh.position, 0x38bdf8, 8);
+      scene.remove(e.mesh);
+      enemies.splice(i, 1);
     }
-    $('ov-over').style.display = 'none';
-    state.mode = 'play';
-    CG.gameplayStart();
-    AudioSys.lvlUp();
-  });
+  }
+  for (let i = enemyShots.length - 1; i >= 0; i--) {
+    scene.remove(enemyShots[i].mesh);
+    enemyShots.splice(i, 1);
+  }
+  $('ov-over').style.display = 'none';
+  state.mode = 'play';
+  AudioSys.lvlUp();
 };
 
 $('btn-double').onclick = () => {
-  CG.requestAd('rewarded', () => {
-    state.doubled = true;
-    save.gold += state.runGold;
-    saveProgress();
-    $('over-gold').textContent = state.runGold * 2;
-    $('btn-double').style.display = 'none';
-    AudioSys.gold();
-  });
+  state.doubled = true;
+  save.gold += state.runGold;
+  saveProgress();
+  $('over-gold').textContent = state.runGold * 2;
+  $('btn-double').style.display = 'none';
+  AudioSys.gold();
 };
 
 $('btn-again').onclick = () => {
-  CG.requestAd('midgame', null, () => startRun());
+  startRun();
 };
 
-/* =========================================================
-   9. INPUT (KEYBOARD + TOUCH / MOUSE VIRTUAL JOYSTICK)
-   ========================================================= */
 const keys = {};
 const joy = { active: false, id: null, sx: 0, sy: 0, dx: 0, dy: 0 };
 
@@ -1019,12 +878,14 @@ function endJoy() {
   $('joy').style.display = 'none';
 }
 
-renderer.domElement.addEventListener('mousedown', e => startJoy(e.clientX, e.clientY, 'mouse'));
+window.addEventListener('mousedown', e => {
+  if (e.target && e.target.tagName === 'CANVAS') startJoy(e.clientX, e.clientY, 'mouse');
+});
 window.addEventListener('mousemove', e => { if (joy.active && joy.id === 'mouse') moveJoy(e.clientX, e.clientY); });
 window.addEventListener('mouseup', () => { if (joy.id === 'mouse') endJoy(); });
 
-renderer.domElement.addEventListener('touchstart', e => {
-  if (e.touches.length > 0) {
+window.addEventListener('touchstart', e => {
+  if (e.target && e.target.tagName === 'CANVAS' && e.touches.length > 0) {
     const t = e.touches[0];
     startJoy(t.clientX, t.clientY, t.identifier);
   }
@@ -1041,30 +902,27 @@ window.addEventListener('touchend', e => {
   }
 });
 
-/* =========================================================
-   10. ARTICULATED ENEMIES, HOMING COMBAT & MELEE SWORD ARC
-   ========================================================= */
 function spawnEnemy(type, customDist = ARENA_R - 1.5) {
+  if (!scene) return;
   const angle = Math.random() * Math.PI * 2;
   const x = Math.cos(angle) * customDist;
   const z = Math.sin(angle) * customDist;
 
   const waveMult = 1 + state.time / 60;
-  let cfg = { hp: 26 * waveMult, spd: 3.4, dmg: 10, rad: 0.55, col: 0x22c55e, xp: 6, gold: 2, isBoss: false, ranged: false, scale: 1 };
+  let cfg = { hp: 26 * waveMult, spd: 3.4, dmg: 12, rad: 0.55, col: 0x22c55e, xp: 6, gold: 2, isBoss: false, ranged: false, scale: 1 };
 
   if (type === 'brute') {
-    cfg = { hp: 78 * waveMult, spd: 2.35, dmg: 18, rad: 0.85, col: 0xf97316, xp: 16, gold: 5, isBoss: false, ranged: false, scale: 1.45 };
+    cfg = { hp: 78 * waveMult, spd: 2.35, dmg: 20, rad: 0.85, col: 0xf97316, xp: 16, gold: 5, isBoss: false, ranged: false, scale: 1.45 };
   } else if (type === 'imp') {
-    cfg = { hp: 34 * waveMult, spd: 2.9, dmg: 12, rad: 0.58, col: 0xa855f7, xp: 10, gold: 4, isBoss: false, ranged: true, scale: 1.05 };
+    cfg = { hp: 34 * waveMult, spd: 2.9, dmg: 16, rad: 0.58, col: 0xa855f7, xp: 10, gold: 4, isBoss: false, ranged: true, scale: 1.05 };
   } else if (type === 'boss') {
-    cfg = { hp: 580 * waveMult, spd: 2.45, dmg: 24, rad: 1.5, col: 0xef4444, xp: 95, gold: 50, isBoss: true, ranged: true, scale: 2.35 };
+    cfg = { hp: 580 * waveMult, spd: 2.45, dmg: 26, rad: 1.5, col: 0xef4444, xp: 95, gold: 50, isBoss: true, ranged: true, scale: 2.35 };
   }
 
   const g = new THREE.Group();
   const mat = toonMat(cfg.col);
   const darkMat = toonMat(0x1e293b);
 
-  // Articulated Enemy Legs
   const legs = [-0.2, 0.2].map(lx => {
     const piv = new THREE.Group();
     piv.position.set(lx, 0.42, 0);
@@ -1075,7 +933,6 @@ function spawnEnemy(type, customDist = ARENA_R - 1.5) {
     return piv;
   });
 
-  // Torso & Head
   const torso = addOutline(new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.42, 0.72, 10), mat));
   torso.position.y = 0.78;
   torso.castShadow = true;
@@ -1086,7 +943,6 @@ function spawnEnemy(type, customDist = ARENA_R - 1.5) {
   head.castShadow = true;
   g.add(head);
 
-  // Horns & Glowing Eyes
   for (const s of [-1, 1]) {
     const eye = new THREE.Mesh(new THREE.SphereGeometry(0.065, 6, 6), new THREE.MeshBasicMaterial({ color: 0xfef08a }));
     eye.position.set(s * 0.14, 1.34, 0.3);
@@ -1098,13 +954,12 @@ function spawnEnemy(type, customDist = ARENA_R - 1.5) {
     g.add(horn);
   }
 
-  // Articulated Enemy Arms
   const arms = [-0.46, 0.46].map(ax => {
     const piv = new THREE.Group();
     piv.position.set(ax, 1.02, 0);
     const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.08, 0.48, 8), mat);
     arm.position.y = -0.2;
-    arm.rotation.x = -0.65; // zombie / monster reach pose
+    arm.rotation.x = -0.65;
     piv.add(arm);
     g.add(piv);
     return piv;
@@ -1121,28 +976,15 @@ function spawnEnemy(type, customDist = ARENA_R - 1.5) {
   scene.add(g);
 
   enemies.push({
-    mesh: g,
-    torso,
-    legs,
-    arms,
-    mat,
-    baseCol: cfg.col,
-    hp: cfg.hp,
-    maxHp: cfg.hp,
-    spd: cfg.spd,
-    dmg: cfg.dmg,
-    rad: cfg.rad,
-    xp: cfg.xp,
-    gold: cfg.gold,
-    isBoss: cfg.isBoss,
-    ranged: cfg.ranged,
-    shootCD: rand(1.2, 2.5),
-    flash: 0,
-    phase: Math.random() * 6
+    mesh: g, torso, legs, arms, mat,
+    baseCol: cfg.col, hp: cfg.hp, maxHp: cfg.hp, spd: cfg.spd, dmg: cfg.dmg,
+    rad: cfg.rad, xp: cfg.xp, gold: cfg.gold, isBoss: cfg.isBoss, ranged: cfg.ranged,
+    shootCD: rand(1.0, 2.0), flash: 0, phase: Math.random() * 6
   });
 }
 
 function spawnFloatingText(pos3, text, color = '#fff') {
+  if (!camera) return;
   const v = pos3.clone().project(camera);
   if (v.z > 1) return;
   const x = (v.x * 0.5 + 0.5) * window.innerWidth;
@@ -1158,6 +1000,7 @@ function spawnFloatingText(pos3, text, color = '#fff') {
 }
 
 function spawnBurst(pos3, color, count = 6) {
+  if (!scene) return;
   const geo = new THREE.BoxGeometry(0.22, 0.22, 0.22);
   const mat = new THREE.MeshBasicMaterial({ color });
   for (let i = 0; i < count; i++) {
@@ -1173,7 +1016,7 @@ function spawnBurst(pos3, color, count = 6) {
 function damageEnemy(e, amount, isCrit = false, knockDir = null) {
   e.hp -= amount;
   e.flash = 0.09;
-  e.mat.emissive.setHex(0xffffff);
+  if (e.mat && e.mat.emissive) e.mat.emissive.setHex(0xffffff);
   if (knockDir && !e.isBoss) {
     e.mesh.position.x += knockDir.x * 0.45;
     e.mesh.position.z += knockDir.z * 0.45;
@@ -1189,7 +1032,6 @@ function damageEnemy(e, amount, isCrit = false, knockDir = null) {
     spawnBurst(e.mesh.position, e.baseCol, e.isBoss ? 18 : 7);
 
     if (e.isBoss) {
-      CG.happytime();
       state.shake = 0.45;
       $('boss-bar-wrap').style.display = 'none';
     }
@@ -1204,6 +1046,7 @@ function damageEnemy(e, amount, isCrit = false, knockDir = null) {
 }
 
 function dropPickup(pos3, type, val) {
+  if (!scene) return;
   const isGold = type === 'gold';
   const mesh = new THREE.Mesh(
     isGold ? new THREE.CylinderGeometry(0.28, 0.28, 0.12, 12) : new THREE.OctahedronGeometry(0.26, 0),
@@ -1216,6 +1059,7 @@ function dropPickup(pos3, type, val) {
 }
 
 function getNearestEnemy(maxRange = 24) {
+  if (!heroGroup) return { enemy: null, dist: maxRange };
   let nearest = null, bestD = maxRange;
   for (const e of enemies) {
     const d = e.mesh.position.distanceTo(heroGroup.position);
@@ -1225,9 +1069,7 @@ function getNearestEnemy(maxRange = 24) {
 }
 
 function performAttack(nearest) {
-  if (!nearest) return;
-
-  // Trigger Sword Swing Animation
+  if (!nearest || !heroGroup) return;
   if (heroRig) heroRig.swingTimer = 0.24;
 
   const toEnemy = new THREE.Vector3().subVectors(nearest.mesh.position, heroGroup.position);
@@ -1235,7 +1077,6 @@ function performAttack(nearest) {
   const dist = toEnemy.length() || 1;
   const dir = toEnemy.clone().divideScalar(dist);
 
-  // 1. Wide Melee Sword Cleave when enemy is within 4.2 units (impossible to miss!)
   if (dist <= 4.2) {
     AudioSys.slash();
     slashArc.rotation.z = -Math.atan2(dir.x, dir.z);
@@ -1249,7 +1090,7 @@ function performAttack(nearest) {
       const d = v.length();
       if (d <= 4.3 + e.rad) {
         const dot = d > 0.01 ? v.normalize().dot(dir) : 1;
-        if (dot > 0.15) { // 160-degree frontal cleave
+        if (dot > 0.15) {
           const crit = Math.random() < state.critChance;
           const dmg = Math.round(state.damage * 1.15 * (crit ? 2.2 : 1));
           damageEnemy(e, dmg, crit, dir);
@@ -1258,7 +1099,6 @@ function performAttack(nearest) {
     }
   }
 
-  // 2. Homing Energy Bolts (track moving enemies reliably!)
   AudioSys.shoot();
   const baseAngle = Math.atan2(dir.x, dir.z);
   const count = state.multishot;
@@ -1271,35 +1111,26 @@ function performAttack(nearest) {
     );
     mesh.position.set(heroGroup.position.x + Math.sin(a) * 0.7, 0.95, heroGroup.position.z + Math.cos(a) * 0.7);
     scene.add(mesh);
-    bullets.push({
-      mesh,
-      target: nearest,
-      vx: Math.sin(a) * 21,
-      vz: Math.cos(a) * 21,
-      life: 1.35
-    });
+    bullets.push({ mesh, target: nearest, vx: Math.sin(a) * 21, vz: Math.cos(a) * 21, life: 1.35 });
   }
 }
 
-/* =========================================================
-   11. MAIN SIMULATION LOOP & CHARACTER ANIMATIONS
-   ========================================================= */
 let spawnTimer = 0;
 
 function updatePlay(dt) {
+  if (!heroGroup) return;
   state.time += dt;
+  if (state.hurtCD > 0) state.hurtCD = Math.max(0, state.hurtCD - dt);
   if (AudioSys.gemTimer > 0) {
     AudioSys.gemTimer -= dt;
     if (AudioSys.gemTimer <= 0) AudioSys.gemCombo = 0;
   }
 
-  // Dash cooldown UI
   if (state.dashCD > 0) {
     state.dashCD = Math.max(0, state.dashCD - dt);
     $('dash-btn').classList.toggle('cd', state.dashCD > 0);
   }
 
-  // Hero Movement
   let mx = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
   let mz = (keys.KeyS || keys.ArrowDown ? 1 : 0) - (keys.KeyW || keys.ArrowUp ? 1 : 0);
   if (joy.active) { mx += joy.dx; mz += joy.dy; }
@@ -1322,14 +1153,12 @@ function updatePlay(dt) {
     moving = true;
   }
 
-  // Clamp inside circular arena
   const r = Math.hypot(heroGroup.position.x, heroGroup.position.z);
   if (r > ARENA_R - 0.8) {
     heroGroup.position.x *= (ARENA_R - 0.8) / r;
     heroGroup.position.z *= (ARENA_R - 0.8) / r;
   }
 
-  // Target Lock & Facing Direction
   const { enemy: nearest } = getNearestEnemy(22);
   if (nearest) {
     targetRing.visible = true;
@@ -1340,9 +1169,8 @@ function updatePlay(dt) {
     targetRing.visible = false;
   }
 
-  // Rotate hero toward nearest enemy when attacking, or toward movement direction
   let desiredYaw = heroGroup.rotation.y;
-  if (nearest && (heroRig && heroRig.swingTimer > 0 || !moving)) {
+  if (nearest && ((heroRig && heroRig.swingTimer > 0) || !moving)) {
     desiredYaw = Math.atan2(nearest.mesh.position.x - heroGroup.position.x, nearest.mesh.position.z - heroGroup.position.z);
   } else if (moving) {
     desiredYaw = Math.atan2(state.dashDirX, state.dashDirZ);
@@ -1351,7 +1179,6 @@ function updatePlay(dt) {
   yawDiff = Math.atan2(Math.sin(yawDiff), Math.cos(yawDiff));
   heroGroup.rotation.y += yawDiff * Math.min(1, dt * 16);
 
-  // Articulated Hero Animations (Walk cycle, Cape flutter, Sword Swing)
   if (heroRig) {
     if (moving) {
       heroRig.walkPhase += dt * 15;
@@ -1386,14 +1213,12 @@ function updatePlay(dt) {
     slashArc.material.opacity = Math.max(0, (state.slashTimer / 0.16) * 0.85);
   }
 
-  // Auto-Attack
   state.fireTimer -= dt;
   if (state.fireTimer <= 0 && nearest) {
     state.fireTimer = state.fireRate;
     performAttack(nearest);
   }
 
-  // Orbiting Blades
   if (state.blades > 0) {
     bladesGroup.position.copy(heroGroup.position);
     bladesGroup.rotation.y += dt * 4.5;
@@ -1410,7 +1235,6 @@ function updatePlay(dt) {
     }
   }
 
-  // Storm Lightning
   if (state.lightning > 0) {
     state.lightningTimer -= dt;
     if (state.lightningTimer <= 0 && enemies.length > 0) {
@@ -1421,13 +1245,12 @@ function updatePlay(dt) {
     }
   }
 
-  // Wave Spawner & Bosses
   spawnTimer -= dt;
   if (spawnTimer <= 0) {
-    spawnTimer = Math.max(0.32, 1.3 - state.time * 0.008);
+    spawnTimer = Math.max(0.35, 1.3 - state.time * 0.008);
     const roll = Math.random();
-    if (state.time > 22 && roll < 0.22) spawnEnemy('imp');
-    else if (state.time > 10 && roll < 0.42) spawnEnemy('brute');
+    if (state.time > 8 && roll < 0.32) spawnEnemy('imp');
+    else if (state.time > 5 && roll < 0.55) spawnEnemy('brute');
     else spawnEnemy('goblin');
   }
   if (state.time >= state.nextBossTime) {
@@ -1437,12 +1260,10 @@ function updatePlay(dt) {
     $('boss-bar-wrap').style.display = 'block';
   }
 
-  // Update Homing Bullets with Generous Hitboxes
   for (let i = bullets.length - 1; i >= 0; i--) {
     const b = bullets[i];
     b.life -= dt;
 
-    // Gentle homing steering toward target enemy
     if (b.target && b.target.hp > 0) {
       const tx = b.target.mesh.position.x - b.mesh.position.x;
       const tz = b.target.mesh.position.z - b.mesh.position.z;
@@ -1476,17 +1297,14 @@ function updatePlay(dt) {
     }
   }
 
-  // Update Articulated Enemies
-  const armorMult = Math.max(0.4, 1 - (save.upg.armor || 0) * 0.06);
   let activeBoss = null;
-
   for (let i = enemies.length - 1; i >= 0; i--) {
     const e = enemies[i];
     if (e.isBoss) activeBoss = e;
     if (e.bladeCD > 0) e.bladeCD -= dt;
     if (e.flash > 0) {
       e.flash -= dt;
-      if (e.flash <= 0) e.mat.emissive.setHex(0x000000);
+      if (e.flash <= 0 && e.mat && e.mat.emissive) e.mat.emissive.setHex(0x000000);
     }
 
     const dx = heroGroup.position.x - e.mesh.position.x;
@@ -1499,7 +1317,6 @@ function updatePlay(dt) {
     }
     e.mesh.rotation.y = Math.atan2(dx, dz);
 
-    // Enemy Walk & Lunge Animation
     e.phase += dt * (e.spd * 3.2);
     const w = Math.sin(e.phase);
     e.legs[0].rotation.x = w * 0.75;
@@ -1511,26 +1328,20 @@ function updatePlay(dt) {
     if (e.ranged) {
       e.shootCD -= dt;
       if (e.shootCD <= 0) {
-        e.shootCD = e.isBoss ? 1.8 : 2.8;
+        e.shootCD = e.isBoss ? 1.5 : 2.1;
         const shot = new THREE.Mesh(
-          new THREE.SphereGeometry(0.28, 8, 8),
+          new THREE.SphereGeometry(0.36, 10, 10),
           new THREE.MeshBasicMaterial({ color: 0xf43f5e })
         );
-        shot.position.set(e.mesh.position.x, 0.9, e.mesh.position.z);
+        shot.position.set(e.mesh.position.x, 0.95, e.mesh.position.z);
         scene.add(shot);
-        enemyShots.push({ mesh: shot, vx: (dx / dist) * 8.5, vz: (dz / dist) * 8.5, dmg: e.dmg, life: 2.4 });
+        enemyShots.push({ mesh: shot, vx: (dx / dist) * 9.5, vz: (dz / dist) * 9.5, dmg: e.dmg, life: 2.8 });
       }
     }
 
-    // Contact Damage (ignored during invulnerable Dash)
-    if (dist < e.rad + 0.55 && state.dashTime <= 0) {
-      state.hp -= e.dmg * armorMult * dt * 1.35;
-      state.shake = Math.max(state.shake, 0.12);
-      if (state.hp <= 0) {
-        state.hp = 0;
-        triggerGameOver();
-        return;
-      }
+    if (dist < e.rad + 0.65) {
+      damagePlayer(e.dmg * dt * 1.45);
+      if (state.mode !== 'play') return;
     }
   }
 
@@ -1540,23 +1351,17 @@ function updatePlay(dt) {
     $('boss-bar-wrap').style.display = 'none';
   }
 
-  // Enemy Projectiles
   for (let i = enemyShots.length - 1; i >= 0; i--) {
     const s = enemyShots[i];
     s.life -= dt;
     s.mesh.position.x += s.vx * dt;
     s.mesh.position.z += s.vz * dt;
-    if (s.mesh.position.distanceTo(heroGroup.position) < 0.7 && state.dashTime <= 0) {
-      state.hp -= s.dmg * armorMult;
-      state.shake = 0.22;
-      AudioSys.hurt();
+    const sDist = Math.hypot(s.mesh.position.x - heroGroup.position.x, s.mesh.position.z - heroGroup.position.z);
+    if (sDist < 0.95) {
+      damagePlayer(s.dmg);
       scene.remove(s.mesh);
       enemyShots.splice(i, 1);
-      if (state.hp <= 0) {
-        state.hp = 0;
-        triggerGameOver();
-        return;
-      }
+      if (state.mode !== 'play') return;
       continue;
     }
     if (s.life <= 0) {
@@ -1565,7 +1370,6 @@ function updatePlay(dt) {
     }
   }
 
-  // Pickups (XP & Gold)
   for (let i = gems.length - 1; i >= 0; i--) {
     const g = gems[i];
     g.bob += dt * 4;
@@ -1599,7 +1403,6 @@ function updatePlay(dt) {
     }
   }
 
-  // Particles
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
     p.life -= dt;
@@ -1614,7 +1417,6 @@ function updatePlay(dt) {
     }
   }
 
-  // Update HUD
   $('hud-time').textContent = fmtTime(state.time);
   $('hud-kills').textContent = state.kills;
   $('hud-gold').textContent = state.runGold;
@@ -1624,53 +1426,52 @@ function updatePlay(dt) {
   $('hp-txt').textContent = `${Math.ceil(state.hp)} / ${state.maxHp}`;
 }
 
-/* =========================================================
-   12. CAMERA & RENDER LOOP
-   ========================================================= */
 let lastTime = performance.now();
 function animate(now) {
   requestAnimationFrame(animate);
   const dt = Math.min(0.05, (now - lastTime) / 1000);
   lastTime = now;
 
-  if (state.mode === 'play' && !state.adPlaying) {
-    updatePlay(dt);
-  } else if (state.mode === 'lobby') {
-    const a = now * 0.0005;
-    heroGroup.rotation.y = a;
-    if (heroRig) {
-      heroRig.root.position.y = Math.sin(now * 0.004) * 0.06;
-      heroRig.capePivot.rotation.x = 0.18 + Math.sin(now * 0.005) * 0.06;
+  if (!scene && window.THREE) initThree();
+
+  if (scene && camera && renderer) {
+    if (state.mode === 'play') {
+      updatePlay(dt);
+    } else if (state.mode === 'lobby' && heroGroup) {
+      const a = now * 0.0005;
+      heroGroup.rotation.y = a;
+      if (heroRig) {
+        heroRig.root.position.y = Math.sin(now * 0.004) * 0.06;
+        heroRig.capePivot.rotation.x = 0.18 + Math.sin(now * 0.005) * 0.06;
+      }
+      camera.position.set(Math.sin(a) * 11, 8.5, Math.cos(a) * 11);
+      camera.lookAt(0, 1.2, 0);
     }
-    camera.position.set(Math.sin(a) * 11, 8.5, Math.cos(a) * 11);
-    camera.lookAt(0, 1.2, 0);
-  }
 
-  if (state.mode !== 'lobby') {
-    state.shake = Math.max(0, state.shake - dt * 1.5);
-    const sx = state.shake ? rand(-state.shake, state.shake) : 0;
-    const sz = state.shake ? rand(-state.shake, state.shake) : 0;
-    const desired = new THREE.Vector3(heroGroup.position.x + sx, 19.5, heroGroup.position.z + 16.5 + sz);
-    camera.position.lerp(desired, Math.min(1, dt * 8));
-    camera.lookAt(heroGroup.position.x, 0.8, heroGroup.position.z);
-  }
+    if (state.mode !== 'lobby' && heroGroup) {
+      state.shake = Math.max(0, state.shake - dt * 1.5);
+      const sx = state.shake ? rand(-state.shake, state.shake) : 0;
+      const sz = state.shake ? rand(-state.shake, state.shake) : 0;
+      const desired = new THREE.Vector3(heroGroup.position.x + sx, 19.5, heroGroup.position.z + 16.5 + sz);
+      camera.position.lerp(desired, Math.min(1, dt * 8));
+      camera.lookAt(heroGroup.position.x, 0.8, heroGroup.position.z);
+    }
 
-  renderer.render(scene, camera);
+    renderer.render(scene, camera);
+  }
 }
 
 window.addEventListener('resize', () => {
+  if (!camera || !renderer) return;
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-(async () => {
-  await CG.init();
-  loadProgress();
-  buildHeroModel();
-  refreshLobbyUI();
-  requestAnimationFrame(animate);
-})();
+loadProgress();
+refreshLobbyUI();
+initThree();
+requestAnimationFrame(animate);
 </script>
 </body>
 </html>
