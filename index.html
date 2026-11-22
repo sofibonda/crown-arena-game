@@ -10,8 +10,9 @@
 html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#1a2238;font-family:'Fredoka',system-ui,-apple-system,sans-serif;color:#fff;touch-action:none}
 canvas{display:block;width:100%;height:100%}
 
+/* HUD */
 #hud{position:fixed;inset:0;pointer-events:none;z-index:3;display:none}
-.top-bar{position:absolute;top:12px;left:12px;right:12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.top-bar{position:absolute;top:12px;left:12px;right:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .pill{background:rgba(18,24,42,.85);border:2px solid rgba(255,255,255,.16);border-radius:14px;padding:6px 14px;display:flex;align-items:center;gap:8px;font-weight:600;font-size:15px;box-shadow:0 4px 14px rgba(0,0,0,.35);backdrop-filter:blur(6px)}
 .icon-btn{pointer-events:auto;cursor:pointer;background:rgba(18,24,42,.9);border:2px solid rgba(255,255,255,.22);color:#fff;border-radius:12px;width:42px;height:42px;display:flex;align-items:center;justify-content:center;font-size:19px;transition:transform .12s,background .15s}
 .icon-btn:hover{transform:scale(1.06);background:rgba(38,50,82,.95)}
@@ -21,7 +22,10 @@ canvas{display:block;width:100%;height:100%}
 #xp-fill{height:100%;width:0%;background:linear-gradient(90deg,#38bdf8,#818cf8,#c084fc);transition:width .15s ease-out}
 #lvl-badge{position:absolute;top:60px;left:50%;transform:translateX(-50%);font-size:12px;font-weight:700;text-shadow:0 1px 3px #000;letter-spacing:.5px;line-height:24px}
 
-#hp-bar-wrap{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);width:min(290px,72vw);text-align:center}
+#sword-hud{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;background:rgba(15,23,42,.86);border:2px solid rgba(253,224,71,.35);border-radius:99px;padding:4px 12px;font-size:12px;font-weight:700;box-shadow:0 3px 10px rgba(0,0,0,.35)}
+.sword-swatch{width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px currentColor}
+
+#hp-bar-wrap{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:min(290px,72vw);text-align:center}
 #hp-bar{height:20px;background:rgba(15,20,35,.9);border:2px solid rgba(255,255,255,.24);border-radius:99px;overflow:hidden;position:relative;box-shadow:0 4px 12px rgba(0,0,0,.4)}
 #hp-fill{height:100%;width:100%;background:linear-gradient(90deg,#ef4444,#22c55e);transition:width .1s}
 #hp-txt{position:absolute;inset:0;font-size:12px;font-weight:700;line-height:16px;text-shadow:0 1px 2px #000}
@@ -39,7 +43,7 @@ canvas{display:block;width:100%;height:100%}
 #joy-knob{position:absolute;left:50%;top:50%;width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.55);transform:translate(-50%,-50%);box-shadow:0 2px 10px rgba(0,0,0,.3)}
 
 .overlay{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:16px;background:radial-gradient(circle at center,rgba(20,28,50,.45),rgba(10,14,26,.82));backdrop-filter:blur(3px)}
-.card{background:linear-gradient(180deg,#232d4b,#171e34);border:2px solid rgba(255,255,255,.16);border-radius:24px;padding:24px;max-width:520px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.55)}
+.card{background:linear-gradient(180deg,#232d4b,#171e34);border:2px solid rgba(255,255,255,.16);border-radius:24px;padding:24px;max-width:540px;width:100%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.55)}
 h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:linear-gradient(180deg,#fff,#fde047);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 3px 0 rgba(0,0,0,.45))}
 .sub{color:#cbd5e1;font-size:15px;margin:0 0 18px}
 
@@ -61,17 +65,100 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
 .grid-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;max-height:52vh;overflow-y:auto;padding-right:2px}
 .upg-item{background:rgba(13,18,34,.8);border:2px solid rgba(255,255,255,.1);border-radius:16px;padding:10px;text-align:left;display:flex;flex-direction:column;justify-content:space-between;gap:8px}
 .upg-top{display:flex;align-items:center;gap:8px}
-.upg-ico{font-size:24px;width:36px;height:36px;border-radius:10px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center}
+.upg-ico{font-size:24px;width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0}
 .upg-title{font-weight:700;font-size:14px;line-height:1.15}
 .upg-lvl{font-size:12px;color:#94a3b8}
 
+/* Sword Forge Visual Preview */
+.sword-forge-banner{
+  background:rgba(10,15,28,.85);
+  border:2px solid rgba(255,255,255,.14);
+  border-radius:16px;
+  padding:10px 14px;
+  margin-top:10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.sword-visual-bar{
+  flex:1;
+  height:14px;
+  border-radius:99px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden;
+  position:relative;
+  border:1px solid rgba(255,255,255,.15);
+}
+.sword-visual-fill{
+  height:100%;
+  width:20%;
+  border-radius:99px;
+  transition:width .25s ease,background .25s ease,box-shadow .25s ease;
+}
+
+/* Level-Up Cards with Rarity Colors */
 .lvl-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
-@media(max-width:560px){.lvl-cards{grid-template-columns:1fr}}
-.pick-card{cursor:pointer;background:linear-gradient(180deg,#2c395e,#1c2540);border:2px solid rgba(255,255,255,.2);border-radius:18px;padding:14px 10px;transition:transform .14s,border-color .14s,box-shadow .14s;display:flex;flex-direction:column;align-items:center;gap:6px}
-.pick-card:hover{transform:translateY(-4px);border-color:#fde047;box-shadow:0 10px 24px rgba(253,224,71,.25)}
-.pick-ico{font-size:34px}
-.pick-name{font-weight:700;font-size:16px;color:#fde047}
-.pick-desc{font-size:13px;color:#cbd5e1;line-height:1.25}
+@media(max-width:600px){.lvl-cards{grid-template-columns:1fr}}
+
+.pick-card{
+  cursor:pointer;
+  background:linear-gradient(180deg,#263254,#171e36);
+  border:2px solid #9ca3af;
+  border-radius:18px;
+  padding:14px 10px;
+  transition:transform .14s,box-shadow .14s,filter .14s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  position:relative;
+}
+.pick-card:hover{transform:translateY(-4px);filter:brightness(1.06)}
+
+.rarity-tag{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.8px;
+  text-transform:uppercase;
+  padding:2px 8px;
+  border-radius:99px;
+  background:rgba(0,0,0,.38);
+}
+
+.rarity-common{border-color:#9ca3af;box-shadow:0 4px 14px rgba(156,163,175,.18)}
+.rarity-common .rarity-tag{color:#e5e7eb}
+.rarity-common .pick-name{color:#f3f4f6}
+
+.rarity-uncommon{border-color:#4ade80;box-shadow:0 4px 16px rgba(74,222,128,.25)}
+.rarity-uncommon .rarity-tag{color:#86efac}
+.rarity-uncommon .pick-name{color:#4ade80}
+
+.rarity-rare{border-color:#60a5fa;box-shadow:0 4px 18px rgba(96,165,250,.3)}
+.rarity-rare .rarity-tag{color:#93c5fd}
+.rarity-rare .pick-name{color:#60a5fa}
+
+.rarity-epic{border-color:#c084fc;box-shadow:0 4px 20px rgba(192,132,252,.35)}
+.rarity-epic .rarity-tag{color:#e9d5ff}
+.rarity-epic .pick-name{color:#c084fc}
+
+.rarity-legendary{border-color:#fbbf24;background:linear-gradient(180deg,#3b2f18,#1d192b);box-shadow:0 6px 24px rgba(251,191,36,.4)}
+.rarity-legendary .rarity-tag{color:#fde047}
+.rarity-legendary .pick-name{color:#fde047}
+
+.pick-ico{font-size:32px}
+.pick-name{font-weight:700;font-size:15px}
+.pick-desc{font-size:12.5px;color:#cbd5e1;line-height:1.25}
+.pick-sword-preview{
+  margin-top:2px;
+  font-size:11px;
+  font-weight:700;
+  padding:3px 8px;
+  border-radius:10px;
+  background:rgba(255,255,255,.07);
+  color:#fde047;
+  width:100%;
+}
 
 #dmg-layer{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden}
 .dmg-num{position:absolute;font-weight:700;font-size:17px;text-shadow:0 2px 4px #000;transform:translate(-50%,-50%);animation:floatUp .65s ease-out forwards}
@@ -84,7 +171,7 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
 
 <div id="hud">
   <div class="top-bar">
-    <div style="display:flex;gap:8px;align-items:center">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <div class="pill">⏱️ <span id="hud-time">00:00</span></div>
       <div class="pill">💀 <span id="hud-kills">0</span></div>
       <div class="pill" style="color:#fde047">🪙 <span id="hud-gold">0</span></div>
@@ -103,6 +190,11 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
     <div id="boss-bar"><div id="boss-fill"></div></div>
   </div>
 
+  <div id="sword-hud">
+    <span class="sword-swatch" id="hud-sword-swatch"></span>
+    <span id="hud-sword-label">⚔️ Iron Blade · Tier 1</span>
+  </div>
+
   <div id="hp-bar-wrap">
     <div id="hp-bar"><div id="hp-fill"></div><div id="hp-txt">100 / 100</div></div>
   </div>
@@ -115,7 +207,7 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
 <div class="overlay" id="ov-lobby">
   <div class="card">
     <h1>CROWN ARENA 3D</h1>
-    <p class="sub">Slash, dodge &amp; evolve to rule the arena!</p>
+    <p class="sub">Slash, dodge &amp; evolve your blade to rule the arena!</p>
     <div class="lobby-stats">
       <div class="stat-box">🪙 Gold: <b id="lob-gold" style="color:#fde047">0</b></div>
       <div class="stat-box">🏆 Best: <b id="lob-best" style="color:#38bdf8">00:00</b></div>
@@ -139,6 +231,17 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
   <div class="card">
     <h2 style="margin:0;font-size:26px">⚡ PERMANENT UPGRADES</h2>
     <div style="color:#fde047;font-weight:700;margin-top:4px">🪙 <span id="upg-gold">0</span></div>
+
+    <div class="sword-forge-banner">
+      <div style="text-align:left">
+        <div id="forge-sword-title" style="font-size:13px;font-weight:700;color:#fde047">⚔️ Blade Tier 1 · Iron</div>
+        <div id="forge-sword-sub" style="font-size:11px;color:#94a3b8">Upgrade Power &amp; Haste to evolve the sword</div>
+      </div>
+      <div class="sword-visual-bar">
+        <div class="sword-visual-fill" id="forge-sword-bar"></div>
+      </div>
+    </div>
+
     <div class="grid-list" id="upg-list"></div>
     <button class="btn btn-sm" id="btn-close-upg" style="width:100%">BACK</button>
   </div>
@@ -154,9 +257,9 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
 </div>
 
 <div class="overlay" id="ov-lvl" style="display:none">
-  <div class="card" style="max-width:620px">
+  <div class="card" style="max-width:660px">
     <h2 style="margin:0;font-size:28px;color:#fde047">✨ LEVEL UP!</h2>
-    <p class="sub" style="margin-bottom:6px">Choose a battle power</p>
+    <p class="sub" style="margin-bottom:6px">Choose a battle power — rarity &amp; blade evolution scale your run</p>
     <div class="lvl-cards" id="lvl-cards"></div>
   </div>
 </div>
@@ -249,7 +352,7 @@ const AudioSys = {
 
 const UPGRADES_DEF = [
   { id: 'hp', name: 'Vitality', ico: '❤️', desc: '+25 Max HP', base: 60, scale: 1.45, max: 10 },
-  { id: 'dmg', name: 'Power', ico: '⚔️', desc: '+15% Damage', base: 75, scale: 1.5, max: 10 },
+  { id: 'dmg', name: 'Blade Power', ico: '⚔️', desc: '+15% Damage & Sword Tier', base: 75, scale: 1.5, max: 10 },
   { id: 'spd', name: 'Agility', ico: '👟', desc: '+6% Move Speed', base: 65, scale: 1.45, max: 8 },
   { id: 'mag', name: 'Magnet', ico: '🧲', desc: '+20% Pickup Range', base: 50, scale: 1.4, max: 8 },
   { id: 'greed', name: 'Greed', ico: '🪙', desc: '+15% Gold Drops', base: 80, scale: 1.5, max: 8 },
@@ -262,6 +365,22 @@ const SKINS_DEF = [
   { id: 'paladin', name: 'Solar Paladin', body: 0xf8fafc, trim: 0xf59e0b, cape: 0xf59e0b, cost: 600 },
   { id: 'reaper', name: 'Crimson Lord', body: 0x7f1d1d, trim: 0xfde047, cape: 0x111827, cost: 1200 }
 ];
+
+const SWORD_TIERS = [
+  { tier: 1, name: 'Iron Blade', hex: '#fde047', color3: 0xfef08a, arc3: 0xfef08a, scale: 1.0, pct: 20 },
+  { tier: 2, name: 'Emerald Edge', hex: '#4ade80', color3: 0x4ade80, arc3: 0x86efac, scale: 1.18, pct: 40 },
+  { tier: 3, name: 'Frostfang', hex: '#60a5fa', color3: 0x38bdf8, arc3: 0x93c5fd, scale: 1.36, pct: 60 },
+  { tier: 4, name: 'Voidreaver', hex: '#c084fc', color3: 0xc084fc, arc3: 0xe9d5ff, scale: 1.56, pct: 80 },
+  { tier: 5, name: 'Solar Crownblade', hex: '#fbbf24', color3: 0xfbbf24, arc3: 0xfde047, scale: 1.8, pct: 100 }
+];
+
+const RARITY_DEF = {
+  common:    { label: 'Common',    cls: 'rarity-common',    weight: 42, mult: 0.85 },
+  uncommon:  { label: 'Uncommon',  cls: 'rarity-uncommon',  weight: 28, mult: 1.05 },
+  rare:      { label: 'Rare',      cls: 'rarity-rare',      weight: 17, mult: 1.3 },
+  epic:      { label: 'Epic',      cls: 'rarity-epic',      weight: 9,  mult: 1.65 },
+  legendary: { label: 'Legendary', cls: 'rarity-legendary', weight: 4,  mult: 2.15 }
+};
 
 let save = {
   gold: 100,
@@ -290,6 +409,15 @@ function saveProgress() {
 
 let renderer, scene, camera, heroGroup, targetRing, slashArc, bladesGroup, heroRig = null;
 const ARENA_R = 22;
+
+const toonMat = (color, extra = {}) => new THREE.MeshToonMaterial({ color, ...extra });
+const outlineMat = new THREE.MeshBasicMaterial({ color: 0x0f172a, side: THREE.BackSide });
+function addOutline(mesh, scale = 1.07) {
+  const hull = new THREE.Mesh(mesh.geometry, outlineMat);
+  hull.scale.setScalar(scale);
+  mesh.add(hull);
+  return mesh;
+}
 
 function initThree() {
   if (!window.THREE) return false;
@@ -392,15 +520,6 @@ function initThree() {
   return true;
 }
 
-const toonMat = (color, extra = {}) => new THREE.MeshToonMaterial({ color, ...extra });
-const outlineMat = new THREE.MeshBasicMaterial({ color: 0x0f172a, side: THREE.BackSide });
-function addOutline(mesh, scale = 1.07) {
-  const hull = new THREE.Mesh(mesh.geometry, outlineMat);
-  hull.scale.setScalar(scale);
-  mesh.add(hull);
-  return mesh;
-}
-
 function buildHeroModel() {
   if (!heroGroup) return;
   while (heroGroup.children.length > 1) heroGroup.remove(heroGroup.children[1]);
@@ -485,14 +604,64 @@ function buildHeroModel() {
   swordGroup.position.set(0, -0.45, 0.15);
   const hilt = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.09, 0.12), trimMat);
   swordGroup.add(hilt);
-  const blade = addOutline(new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.25, 0.22), new THREE.MeshBasicMaterial({ color: 0xfef08a })));
+  const bladeMat = new THREE.MeshBasicMaterial({ color: 0xfef08a });
+  const blade = addOutline(new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.25, 0.22), bladeMat));
   blade.position.set(0, 0.65, 0.18);
   blade.rotation.x = 0.65;
   swordGroup.add(blade);
+  const bladeAura = new THREE.Mesh(
+    new THREE.BoxGeometry(0.22, 1.32, 0.32),
+    new THREE.MeshBasicMaterial({ color: 0xfef08a, transparent: true, opacity: 0.22 })
+  );
+  bladeAura.position.copy(blade.position);
+  bladeAura.rotation.copy(blade.rotation);
+  swordGroup.add(bladeAura);
+
   rightArm.add(swordGroup);
   torso.add(rightArm);
 
-  heroRig = { root, torso, legs, leftArm, rightArm, capePivot, swingTimer: 0, walkPhase: 0 };
+  heroRig = { root, torso, legs, leftArm, rightArm, capePivot, swordGroup, bladeMat, bladeAura, swingTimer: 0, walkPhase: 0 };
+  updateSwordVisuals();
+}
+
+function getSwordTierInfo() {
+  const metaPower = save.upg.dmg || 0;
+  const runPower = state.mode === 'play' || state.mode === 'levelup' ? (state.swordEvo || 0) : 0;
+  const score = metaPower + runPower * 2;
+  const idx = clamp(Math.floor(score / 2.5), 0, SWORD_TIERS.length - 1);
+  return SWORD_TIERS[idx];
+}
+
+function updateSwordVisuals() {
+  const info = getSwordTierInfo();
+  if (heroRig && heroRig.swordGroup) {
+    heroRig.swordGroup.scale.setScalar(info.scale);
+    if (heroRig.bladeMat) heroRig.bladeMat.color.setHex(info.color3);
+    if (heroRig.bladeAura) {
+      heroRig.bladeAura.material.color.setHex(info.color3);
+      heroRig.bladeAura.material.opacity = clamp(0.18 + (info.tier - 1) * 0.1, 0.18, 0.55);
+    }
+  }
+  if (slashArc && slashArc.material) {
+    slashArc.material.color.setHex(info.arc3);
+    slashArc.scale.setScalar(0.95 + (info.tier - 1) * 0.14);
+  }
+  if ($('hud-sword-label')) {
+    $('hud-sword-label').textContent = `⚔️ ${info.name} · Tier ${info.tier}`;
+  }
+  if ($('hud-sword-swatch')) {
+    $('hud-sword-swatch').style.background = info.hex;
+    $('hud-sword-swatch').style.color = info.hex;
+  }
+  if ($('forge-sword-title')) {
+    $('forge-sword-title').textContent = `⚔️ Blade Tier ${info.tier} · ${info.name}`;
+    $('forge-sword-title').style.color = info.hex;
+  }
+  if ($('forge-sword-bar')) {
+    $('forge-sword-bar').style.width = info.pct + '%';
+    $('forge-sword-bar').style.background = info.hex;
+    $('forge-sword-bar').style.boxShadow = `0 0 12px ${info.hex}`;
+  }
 }
 
 function syncOrbitBlades(count) {
@@ -516,6 +685,7 @@ const state = {
   xp: 0,
   xpNext: 22,
   lvl: 1,
+  swordEvo: 0,
   hp: 100,
   maxHp: 100,
   speed: 7.8,
@@ -547,24 +717,42 @@ const gems = [];
 const particles = [];
 
 const RUN_POWERS = [
-  { id: 'multi', ico: '🔱', name: 'Multishot +1', desc: 'Fire +1 extra homing bolt per volley', apply: () => state.multishot++ },
-  { id: 'blade', ico: '🌀', name: 'Orbiting Blade', desc: 'Summon a spinning blade around you', apply: () => { state.blades++; syncOrbitBlades(state.blades); } },
-  { id: 'dmg', ico: '💥', name: 'Heavy Strike', desc: '+30% Sword & Bolt Damage', apply: () => state.damage = Math.round(state.damage * 1.3) },
-  { id: 'haste', ico: '⚡', name: 'Rapid Slash', desc: '+24% Attack Speed', apply: () => state.fireRate *= 0.8 },
-  { id: 'bolt', ico: '🌩️', name: 'Storm Bolt', desc: 'Periodically strikes nearby foes with lightning', apply: () => state.lightning++ },
-  { id: 'heal', ico: '💖', name: 'Vital Surge', desc: 'Restore 50% HP & +25 Max HP', apply: () => { state.maxHp += 25; state.hp = Math.min(state.maxHp, state.hp + state.maxHp * 0.5); } },
-  { id: 'swift', ico: '👟', name: 'Wind Step', desc: '+14% Speed & +25% Magnet Range', apply: () => { state.speed *= 1.14; state.magnet *= 1.25; } },
-  { id: 'crit', ico: '🎯', name: 'Critical Edge', desc: '+15% Critical Hit Chance (2.2x DMG)', apply: () => state.critChance = Math.min(0.85, state.critChance + 0.15) }
+  { id: 'sword_evo', ico: '🗡️', name: 'Blade Evolution', baseRarity: 'rare', swordTag: 'Evolves 3D Sword + DMG', desc: 'Forges a larger, sharper blade & +25% damage', apply: (m) => { state.swordEvo++; state.damage = Math.round(state.damage * (1 + 0.25 * m)); updateSwordVisuals(); } },
+  { id: 'multi', ico: '🔱', name: 'Multishot +1', baseRarity: 'rare', swordTag: '+1 Homing Bolt', desc: 'Fire +1 extra homing bolt per volley', apply: () => state.multishot++ },
+  { id: 'blade', ico: '🌀', name: 'Orbiting Blade', baseRarity: 'uncommon', swordTag: 'Adds Spinning Blade', desc: 'Summon a spinning blade around you', apply: () => { state.blades++; syncOrbitBlades(state.blades); } },
+  { id: 'dmg', ico: '💥', name: 'Heavy Strike', baseRarity: 'uncommon', swordTag: 'Boosts Sword Strike', desc: '+28% Sword & Bolt Damage', apply: (m) => { state.damage = Math.round(state.damage * (1 + 0.28 * m)); if (Math.random() < 0.45) state.swordEvo++; updateSwordVisuals(); } },
+  { id: 'haste', ico: '⚡', name: 'Rapid Slash', baseRarity: 'uncommon', swordTag: 'Faster Swing Speed', desc: '+22% Attack Speed', apply: (m) => state.fireRate = Math.max(0.14, state.fireRate / (1 + 0.22 * m)) },
+  { id: 'bolt', ico: '🌩️', name: 'Storm Bolt', baseRarity: 'epic', swordTag: 'Arc Lightning Strike', desc: 'Periodically strikes nearby foes with lightning', apply: () => state.lightning++ },
+  { id: 'heal', ico: '💖', name: 'Vital Surge', baseRarity: 'common', swordTag: 'Heals & Max HP', desc: 'Restore 50% HP & +25 Max HP', apply: (m) => { const add = Math.round(25 * m); state.maxHp += add; state.hp = Math.min(state.maxHp, state.hp + state.maxHp * 0.5); } },
+  { id: 'swift', ico: '👟', name: 'Wind Step', baseRarity: 'common', swordTag: 'Faster Footwork', desc: '+14% Speed & +25% Magnet Range', apply: (m) => { state.speed *= (1 + 0.14 * m); state.magnet *= 1.25; } },
+  { id: 'crit', ico: '🎯', name: 'Critical Edge', baseRarity: 'legendary', swordTag: '2.2x Crit Finisher', desc: '+18% Critical Hit Chance (2.2x DMG)', apply: (m) => state.critChance = Math.min(0.9, state.critChance + 0.18 * m) }
 ];
+
+function rollRarity(baseRarity) {
+  const keys = Object.keys(RARITY_DEF);
+  const baseIdx = Math.max(0, keys.indexOf(baseRarity || 'common'));
+  const totalW = keys.reduce((acc, k) => acc + RARITY_DEF[k].weight, 0);
+  let r = Math.random() * totalW;
+  let pickedIdx = 0;
+  for (let i = 0; i < keys.length; i++) {
+    r -= RARITY_DEF[keys[i]].weight;
+    if (r <= 0) { pickedIdx = i; break; }
+  }
+  const finalIdx = clamp(Math.round((pickedIdx + baseIdx) / 2), 0, keys.length - 1);
+  const key = keys[finalIdx];
+  return { key, ...RARITY_DEF[key] };
+}
 
 function refreshLobbyUI() {
   $('lob-gold').textContent = save.gold;
   $('lob-best').textContent = fmtTime(save.bestTime);
   $('lob-kills').textContent = save.bestKills;
+  updateSwordVisuals();
 }
 
 function renderUpgradesModal() {
   $('upg-gold').textContent = save.gold;
+  updateSwordVisuals();
   $('upg-list').innerHTML = UPGRADES_DEF.map(u => {
     const lvl = save.upg[u.id] || 0;
     const maxed = lvl >= u.max;
@@ -596,6 +784,7 @@ window.buyUpgrade = id => {
   save.upg[id] = lvl + 1;
   saveProgress();
   AudioSys.gold();
+  updateSwordVisuals();
   renderUpgradesModal();
   refreshLobbyUI();
 };
@@ -698,32 +887,34 @@ function startRun() {
   state.kills = 0;
   state.runGold = 0;
   state.xp = 0;
-  state.xpNext = 22;
+  state.xpNext = 20;
   state.lvl = 1;
+  state.swordEvo = 0;
 
   state.maxHp = 100 + (save.upg.hp || 0) * 25;
   state.hp = state.maxHp;
-  state.damage = Math.round(22 * (1 + (save.upg.dmg || 0) * 0.15));
-  state.speed = 7.8 * (1 + (save.upg.spd || 0) * 0.06);
-  state.magnet = 3.8 * (1 + (save.upg.mag || 0) * 0.20);
-  state.fireRate = 0.48;
+  state.damage = Math.round(24 * (1 + (save.upg.dmg || 0) * 0.16));
+  state.speed = 8.0 * (1 + (save.upg.spd || 0) * 0.06);
+  state.magnet = 4.0 * (1 + (save.upg.mag || 0) * 0.20);
+  state.fireRate = 0.44;
   state.fireTimer = 0;
   state.slashTimer = 0;
   state.multishot = 1;
   state.blades = 0;
   state.lightning = 0;
   state.lightningTimer = 0;
-  state.critChance = 0.12;
+  state.critChance = 0.15;
   state.dashCD = 0;
   state.dashTime = 0;
   state.hurtCD = 0;
   state.revived = false;
   state.doubled = false;
-  state.nextBossTime = 50;
+  state.nextBossTime = 55;
   state.shake = 0;
 
   heroGroup.position.set(0, 0, 0);
   heroGroup.rotation.set(0, 0, 0);
+  updateSwordVisuals();
 
   $('ov-lobby').style.display = 'none';
   $('ov-over').style.display = 'none';
@@ -747,23 +938,32 @@ function returnToLobby() {
   refreshLobbyUI();
 }
 
+let activeOffers = [];
+
 function triggerLevelUp() {
   state.mode = 'levelup';
   AudioSys.lvlUp();
   const pool = [...RUN_POWERS].sort(() => Math.random() - 0.5).slice(0, 3);
-  $('lvl-cards').innerHTML = pool.map(p => `
-    <div class="pick-card" onclick="pickPower('${p.id}')">
-      <div class="pick-ico">${p.ico}</div>
-      <div class="pick-name">${p.name}</div>
-      <div class="pick-desc">${p.desc}</div>
+  activeOffers = pool.map(p => ({ power: p, rarity: rollRarity(p.baseRarity) }));
+
+  $('lvl-cards').innerHTML = activeOffers.map((item, idx) => `
+    <div class="pick-card ${item.rarity.cls}" onclick="pickPower(${idx})">
+      <span class="rarity-tag">${item.rarity.label}</span>
+      <div class="pick-ico">${item.power.ico}</div>
+      <div class="pick-name">${item.power.name}</div>
+      <div class="pick-desc">${item.power.desc}</div>
+      <div class="pick-sword-preview">⚔️ ${item.power.swordTag}</div>
     </div>
   `).join('');
   $('ov-lvl').style.display = 'flex';
 }
 
-window.pickPower = id => {
-  const p = RUN_POWERS.find(x => x.id === id);
-  if (p) p.apply();
+window.pickPower = idx => {
+  const chosen = activeOffers[idx];
+  if (chosen && chosen.power) {
+    chosen.power.apply(chosen.rarity.mult);
+    updateSwordVisuals();
+  }
   $('ov-lvl').style.display = 'none';
   state.mode = 'play';
 };
@@ -908,15 +1108,15 @@ function spawnEnemy(type, customDist = ARENA_R - 1.5) {
   const x = Math.cos(angle) * customDist;
   const z = Math.sin(angle) * customDist;
 
-  const waveMult = 1 + state.time / 60;
-  let cfg = { hp: 26 * waveMult, spd: 3.4, dmg: 12, rad: 0.55, col: 0x22c55e, xp: 6, gold: 2, isBoss: false, ranged: false, scale: 1 };
+  const waveMult = 1 + state.time / 75;
+  let cfg = { hp: 24 * waveMult, spd: 3.3, dmg: 11, rad: 0.55, col: 0x22c55e, xp: 7, gold: 2, isBoss: false, ranged: false, scale: 1 };
 
   if (type === 'brute') {
-    cfg = { hp: 78 * waveMult, spd: 2.35, dmg: 20, rad: 0.85, col: 0xf97316, xp: 16, gold: 5, isBoss: false, ranged: false, scale: 1.45 };
+    cfg = { hp: 72 * waveMult, spd: 2.3, dmg: 18, rad: 0.85, col: 0xf97316, xp: 18, gold: 5, isBoss: false, ranged: false, scale: 1.45 };
   } else if (type === 'imp') {
-    cfg = { hp: 34 * waveMult, spd: 2.9, dmg: 16, rad: 0.58, col: 0xa855f7, xp: 10, gold: 4, isBoss: false, ranged: true, scale: 1.05 };
+    cfg = { hp: 32 * waveMult, spd: 2.85, dmg: 15, rad: 0.58, col: 0xa855f7, xp: 11, gold: 4, isBoss: false, ranged: true, scale: 1.05 };
   } else if (type === 'boss') {
-    cfg = { hp: 580 * waveMult, spd: 2.45, dmg: 26, rad: 1.5, col: 0xef4444, xp: 95, gold: 50, isBoss: true, ranged: true, scale: 2.35 };
+    cfg = { hp: 540 * waveMult, spd: 2.4, dmg: 24, rad: 1.5, col: 0xef4444, xp: 110, gold: 55, isBoss: true, ranged: true, scale: 2.35 };
   }
 
   const g = new THREE.Group();
@@ -1072,12 +1272,15 @@ function performAttack(nearest) {
   if (!nearest || !heroGroup) return;
   if (heroRig) heroRig.swingTimer = 0.24;
 
+  const swordInfo = getSwordTierInfo();
+  const cleaveRadius = 4.2 + (swordInfo.tier - 1) * 0.35;
+
   const toEnemy = new THREE.Vector3().subVectors(nearest.mesh.position, heroGroup.position);
   toEnemy.y = 0;
   const dist = toEnemy.length() || 1;
   const dir = toEnemy.clone().divideScalar(dist);
 
-  if (dist <= 4.2) {
+  if (dist <= cleaveRadius) {
     AudioSys.slash();
     slashArc.rotation.z = -Math.atan2(dir.x, dir.z);
     slashArc.material.opacity = 0.9;
@@ -1088,11 +1291,11 @@ function performAttack(nearest) {
       const v = new THREE.Vector3().subVectors(e.mesh.position, heroGroup.position);
       v.y = 0;
       const d = v.length();
-      if (d <= 4.3 + e.rad) {
+      if (d <= cleaveRadius + e.rad) {
         const dot = d > 0.01 ? v.normalize().dot(dir) : 1;
         if (dot > 0.15) {
           const crit = Math.random() < state.critChance;
-          const dmg = Math.round(state.damage * 1.15 * (crit ? 2.2 : 1));
+          const dmg = Math.round(state.damage * (1.15 + (swordInfo.tier - 1) * 0.08) * (crit ? 2.2 : 1));
           damageEnemy(e, dmg, crit, dir);
         }
       }
@@ -1107,7 +1310,7 @@ function performAttack(nearest) {
     const a = baseAngle + (i - (count - 1) / 2) * spread;
     const mesh = new THREE.Mesh(
       new THREE.SphereGeometry(0.28, 10, 10),
-      new THREE.MeshBasicMaterial({ color: 0xfde047 })
+      new THREE.MeshBasicMaterial({ color: swordInfo.color3 })
     );
     mesh.position.set(heroGroup.position.x + Math.sin(a) * 0.7, 0.95, heroGroup.position.z + Math.cos(a) * 0.7);
     scene.add(mesh);
@@ -1247,10 +1450,10 @@ function updatePlay(dt) {
 
   spawnTimer -= dt;
   if (spawnTimer <= 0) {
-    spawnTimer = Math.max(0.35, 1.3 - state.time * 0.008);
+    spawnTimer = Math.max(0.38, 1.35 - state.time * 0.007);
     const roll = Math.random();
-    if (state.time > 8 && roll < 0.32) spawnEnemy('imp');
-    else if (state.time > 5 && roll < 0.55) spawnEnemy('brute');
+    if (state.time > 8 && roll < 0.30) spawnEnemy('imp');
+    else if (state.time > 5 && roll < 0.52) spawnEnemy('brute');
     else spawnEnemy('goblin');
   }
   if (state.time >= state.nextBossTime) {
@@ -1391,7 +1594,7 @@ function updatePlay(dt) {
         if (state.xp >= state.xpNext) {
           state.xp -= state.xpNext;
           state.lvl++;
-          state.xpNext = Math.round(state.xpNext * 1.28 + 10);
+          state.xpNext = Math.round(state.xpNext * 1.24 + 9);
           scene.remove(g.mesh);
           gems.splice(i, 1);
           triggerLevelUp();
