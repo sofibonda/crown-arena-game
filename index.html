@@ -511,12 +511,12 @@ function initThree() {
   scene.add(targetRing);
 
   slashArc = new THREE.Mesh(
-    new THREE.RingGeometry(0.9, 4.5, 28, 1, -Math.PI * 0.36, Math.PI * 0.72),
+    new THREE.RingGeometry(0.85, 4.6, 32, 1, -Math.PI * 0.42, Math.PI * 0.84),
     new THREE.MeshBasicMaterial({ color: 0xfef08a, side: THREE.DoubleSide, transparent: true, opacity: 0 })
   );
-  slashArc.rotation.order = 'YXZ';
-  slashArc.rotation.x = -Math.PI / 2;
-  slashArc.position.y = 0.75;
+  slashArc.rotation.order = 'ZYX';
+  slashArc.rotation.set(-Math.PI / 2, 0, -Math.PI / 2);
+  slashArc.position.set(0, 0.8, 0);
   heroGroup.add(slashArc);
 
   bladesGroup = new THREE.Group();
@@ -650,7 +650,7 @@ function updateSwordVisuals() {
   }
   if (slashArc && slashArc.material) {
     slashArc.material.color.setHex(info.arc3);
-    const slashScale = (4.6 + (info.tier - 1) * 0.4) / 4.5;
+    const slashScale = (4.8 + (info.tier - 1) * 0.4) / 4.6;
     slashArc.scale.set(slashScale, slashScale, 1);
   }
   if ($('hud-sword-label')) {
@@ -1308,17 +1308,19 @@ function performAttack(nearest) {
   if (heroRig) heroRig.swingTimer = 0.24;
 
   const swordInfo = getSwordTierInfo();
-  const cleaveRadius = 4.6 + (swordInfo.tier - 1) * 0.4;
+  const cleaveRadius = 4.8 + (swordInfo.tier - 1) * 0.4;
 
   const toEnemy = new THREE.Vector3().subVectors(nearest.mesh.position, heroGroup.position);
   toEnemy.y = 0;
   const dist = toEnemy.length() || 1;
   const dir = toEnemy.clone().divideScalar(dist);
 
+  // Snap hero facing directly toward the target enemy on swing so sword, arc & hit cone always match
+  heroGroup.rotation.y = Math.atan2(dir.x, dir.z);
+
   AudioSys.slash();
-  const aimAngle = Math.atan2(dir.x, dir.z);
-  slashArc.rotation.y = aimAngle - Math.PI / 2;
-  slashArc.material.opacity = 0.92;
+  slashArc.rotation.set(-Math.PI / 2, 0, -Math.PI / 2);
+  slashArc.material.opacity = 0.95;
   state.slashTimer = 0.18;
 
   for (let i = enemies.length - 1; i >= 0; i--) {
@@ -1328,7 +1330,7 @@ function performAttack(nearest) {
     const d = v.length();
     if (d <= cleaveRadius + e.rad) {
       const dot = d > 0.01 ? v.normalize().dot(dir) : 1;
-      if (dot > -0.1) {
+      if (dot > -0.25) {
         const crit = Math.random() < state.critChance;
         const dmg = Math.round(state.damage * (1.2 + (swordInfo.tier - 1) * 0.06) * (crit ? 2.2 : 1));
         damageEnemy(e, dmg, crit, dir);
