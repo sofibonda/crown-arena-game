@@ -298,7 +298,6 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" onerror="var s=document.createElement('script');s.src='https://unpkg.com/three@0.128.0/build/three.min.js';document.head.appendChild(s)"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js" onerror="var s=document.createElement('script');s.src='https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js';document.head.appendChild(s)"></script>
 <script>
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -366,10 +365,10 @@ const UPGRADES_DEF = [
 ];
 
 const SKINS_DEF = [
-  { id: 'knight', name: 'Knight', model: 'models/Knight.glb', body: 0x3b82f6, trim: 0xfacc15, cape: 0xdc2626, cost: 0, scale: 1.0 },
-  { id: 'barbarian', name: 'Barbarian', model: 'models/Barbarian.glb', body: 0xf97316, trim: 0xfde047, cape: 0x991b1b, cost: 250, scale: 1.05 },
-  { id: 'rogue', name: 'Hooded Rogue', model: 'models/Rogue_Hooded.glb', body: 0x10b981, trim: 0x38bdf8, cape: 0x065f46, cost: 600, scale: 1.0 },
-  { id: 'mage', name: 'Arcane Mage', model: 'models/Mage.glb', body: 0xa855f7, trim: 0xfde047, cape: 0x4c1d95, cost: 1200, scale: 1.0 }
+  { id: 'knight', name: 'Azure Knight', body: 0x3b82f6, trim: 0xfacc15, cape: 0xdc2626, cost: 0 },
+  { id: 'ninja', name: 'Shadow Ninja', body: 0x1e293b, trim: 0x38bdf8, cape: 0x0ea5e9, cost: 250 },
+  { id: 'paladin', name: 'Solar Paladin', body: 0xf8fafc, trim: 0xf59e0b, cape: 0xf59e0b, cost: 600 },
+  { id: 'reaper', name: 'Crimson Lord', body: 0x7f1d1d, trim: 0xfde047, cape: 0x111827, cost: 1200 }
 ];
 
 const SWORD_TIERS = [
@@ -526,98 +525,8 @@ function initThree() {
   return true;
 }
 
-const gltfLoader = (window.THREE && THREE.GLTFLoader) ? new THREE.GLTFLoader() : null;
-const modelCache = new Map();
-
-function loadGlbCached(url) {
-  if (modelCache.has(url)) return modelCache.get(url);
-  if (!gltfLoader) {
-    const p = Promise.resolve(null);
-    modelCache.set(url, p);
-    return p;
-  }
-  const p = new Promise(resolve => {
-    gltfLoader.load(
-      url,
-      gltf => resolve(gltf),
-      undefined,
-      () => resolve(null)
-    );
-  });
-  modelCache.set(url, p);
-  return p;
-}
-
-function normalizeAndAttachGlb(targetGroup, gltf, desiredHeight = 1.85) {
-  const sceneObj = gltf.scene.clone(true);
-  sceneObj.traverse(obj => {
-    if (obj.isMesh) {
-      obj.castShadow = true;
-      obj.receiveShadow = true;
-    }
-  });
-
-  const box = new THREE.Box3().setFromObject(sceneObj);
-  const size = new THREE.Vector3();
-  box.getSize(size);
-  const h = size.y > 0.001 ? size.y : 1.0;
-  const s = desiredHeight / h;
-  sceneObj.scale.multiplyScalar(s);
-
-  const box2 = new THREE.Box3().setFromObject(sceneObj);
-  sceneObj.position.y += -box2.min.y;
-  sceneObj.position.x += -(box2.min.x + box2.max.x) * 0.5;
-  sceneObj.position.z += -(box2.min.z + box2.max.z) * 0.5;
-
-  targetGroup.add(sceneObj);
-
-  let mixer = null;
-  const actions = {};
-  if (gltf.animations && gltf.animations.length > 0) {
-    mixer = new THREE.AnimationMixer(sceneObj);
-    gltf.animations.forEach((clip, idx) => {
-      const key = clip.name.toLowerCase();
-      actions[key] = mixer.clipAction(clip);
-      if (idx === 0) actions._first = actions[key];
-    });
-  }
-  return { sceneObj, mixer, actions };
-}
-
-function playAnimByKeywords(actions, keywords, fallbackFirst = false) {
-  if (!actions) return null;
-  for (const kw of keywords) {
-    for (const k of Object.keys(actions)) {
-      if (k === '_first') continue;
-      if (k.includes(kw)) return actions[k];
-    }
-  }
-  return fallbackFirst ? actions._first || null : null;
-}
-
-function switchMixerAction(rig, nextAction, fade = 0.14) {
-  if (!rig || !rig.mixer || !nextAction) return;
-  if (rig.activeAction === nextAction) {
-    if (!nextAction.isRunning()) nextAction.play();
-    return;
-  }
-  if (rig.activeAction) {
-    nextAction.reset();
-    nextAction.setEffectiveTimeScale(1);
-    nextAction.setEffectiveWeight(1);
-    nextAction.crossFadeFrom(rig.activeAction, fade, true);
-    nextAction.play();
-  } else {
-    nextAction.reset().play();
-  }
-  rig.activeAction = nextAction;
-}
-
-let heroBuildToken = 0;
-
 function buildHeroModel() {
   if (!heroGroup) return;
-  const token = ++heroBuildToken;
   while (heroGroup.children.length > 1) heroGroup.remove(heroGroup.children[1]);
   const sk = SKINS_DEF.find(s => s.id === save.skin) || SKINS_DEF[0];
   const bodyMat = toonMat(sk.body);
@@ -716,31 +625,8 @@ function buildHeroModel() {
   rightArm.add(swordGroup);
   torso.add(rightArm);
 
-  heroRig = {
-    root, torso, legs, leftArm, rightArm, capePivot, swordGroup, bladeMat, bladeAura,
-    swingTimer: 0, walkPhase: 0, mixer: null, actions: null, activeAction: null, isGlb: false
-  };
+  heroRig = { root, torso, legs, leftArm, rightArm, capePivot, swordGroup, bladeMat, bladeAura, swingTimer: 0, walkPhase: 0 };
   updateSwordVisuals();
-
-  if (sk.model) {
-    loadGlbCached(sk.model).then(gltf => {
-      if (!gltf || token !== heroBuildToken || !heroGroup) return;
-      root.visible = false;
-      const glbHolder = new THREE.Group();
-      glbHolder.name = 'glbHeroHolder';
-      heroGroup.add(glbHolder);
-      const { mixer, actions } = normalizeAndAttachGlb(glbHolder, gltf, 1.9 * (sk.scale || 1));
-      heroRig.isGlb = true;
-      heroRig.glbHolder = glbHolder;
-      heroRig.mixer = mixer;
-      heroRig.actions = actions;
-      const idleAct = playAnimByKeywords(actions, ['idle', 'stand'], true);
-      if (idleAct) {
-        idleAct.play();
-        heroRig.activeAction = idleAct;
-      }
-    });
-  }
 }
 
 function getSwordTierInfo() {
@@ -856,10 +742,12 @@ function rollRarity(baseRarity) {
     r -= RARITY_DEF[keys[i]].weight;
     if (r <= 0) { pickedIdx = i; break; }
   }
+  // Slight nudge from baseRarity without inflating Epic/Legendary odds
   const baseIdx = Math.max(0, keys.indexOf(baseRarity || 'common'));
   let finalIdx = pickedIdx;
   if (pickedIdx === 0 && baseIdx >= 1 && Math.random() < 0.35) finalIdx = 1;
   if (pickedIdx === 1 && baseIdx >= 2 && Math.random() < 0.25) finalIdx = 2;
+  // Cap high rarity unless genuinely rolled
   if (finalIdx >= 3 && pickedIdx < 3) finalIdx = Math.min(finalIdx, 2);
   const key = keys[finalIdx];
   return { key, ...RARITY_DEF[key] };
@@ -956,6 +844,7 @@ $('btn-open-upg').onclick = () => { AudioSys.init(); renderUpgradesModal(); $('o
 $('btn-close-upg').onclick = () => { $('ov-upg').style.display = 'none'; };
 $('btn-open-skins').onclick = () => { AudioSys.init(); renderSkinsModal(); $('ov-skins').style.display = 'flex'; };
 $('btn-close-skins').onclick = () => { $('ov-skins').style.display = 'none'; };
+
 
 $('btn-reset-save').onclick = () => {
   AudioSys.init();
@@ -1251,26 +1140,14 @@ function spawnEnemy(type, customDist = ARENA_R - 1.5) {
   const z = Math.sin(angle) * customDist;
 
   const waveMult = 1 + state.time / 60;
-  let cfg = {
-    model: 'models/Skeleton_Minion.glb', height: 1.65,
-    hp: 26 * waveMult, spd: 3.4, dmg: 12, rad: 0.55, col: 0x22c55e, xp: 6, gold: 2, isBoss: false, ranged: false, scale: 1
-  };
+  let cfg = { hp: 26 * waveMult, spd: 3.4, dmg: 12, rad: 0.55, col: 0x22c55e, xp: 6, gold: 2, isBoss: false, ranged: false, scale: 1 };
 
   if (type === 'brute') {
-    cfg = {
-      model: 'models/Skeleton_Warrior.glb', height: 2.5,
-      hp: 78 * waveMult, spd: 2.35, dmg: 20, rad: 0.9, col: 0xf97316, xp: 16, gold: 5, isBoss: false, ranged: false, scale: 1.45
-    };
+    cfg = { hp: 78 * waveMult, spd: 2.35, dmg: 20, rad: 0.85, col: 0xf97316, xp: 16, gold: 5, isBoss: false, ranged: false, scale: 1.45 };
   } else if (type === 'imp') {
-    cfg = {
-      model: 'models/Skeleton_Rogue.glb', height: 1.72,
-      hp: 34 * waveMult, spd: 2.9, dmg: 16, rad: 0.58, col: 0xa855f7, xp: 10, gold: 4, isBoss: false, ranged: true, scale: 1.05
-    };
+    cfg = { hp: 34 * waveMult, spd: 2.9, dmg: 16, rad: 0.58, col: 0xa855f7, xp: 10, gold: 4, isBoss: false, ranged: true, scale: 1.05 };
   } else if (type === 'boss') {
-    cfg = {
-      model: 'models/Skeleton_Mage.glb', height: 3.65,
-      hp: 580 * waveMult, spd: 2.45, dmg: 26, rad: 1.55, col: 0xef4444, xp: 95, gold: 50, isBoss: true, ranged: true, scale: 2.35
-    };
+    cfg = { hp: 580 * waveMult, spd: 2.45, dmg: 26, rad: 1.5, col: 0xef4444, xp: 95, gold: 50, isBoss: true, ranged: true, scale: 2.35 };
   }
 
   const g = new THREE.Group();
@@ -1329,38 +1206,12 @@ function spawnEnemy(type, customDist = ARENA_R - 1.5) {
   g.position.set(x, 0, z);
   scene.add(g);
 
-  const enemyEntry = {
+  enemies.push({
     mesh: g, torso, legs, arms, mat,
     baseCol: cfg.col, hp: cfg.hp, maxHp: cfg.hp, spd: cfg.spd, dmg: cfg.dmg,
     rad: cfg.rad, xp: cfg.xp, gold: cfg.gold, isBoss: cfg.isBoss, ranged: cfg.ranged,
-    shootCD: rand(1.0, 2.0), flash: 0, phase: Math.random() * 6,
-    mixer: null, actions: null, activeAction: null, isGlb: false
-  };
-  enemies.push(enemyEntry);
-
-  if (cfg.model) {
-    loadGlbCached(cfg.model).then(gltf => {
-      if (!gltf || enemyEntry.hp <= 0 || !enemies.includes(enemyEntry)) return;
-      g.scale.setScalar(1);
-      torso.visible = false;
-      arms.forEach(a => a.visible = false);
-      legs.forEach(l => l.visible = false);
-      const crownObj = g.children.find(ch => ch.geometry && ch.geometry.type === 'CylinderGeometry' && ch.position.y > 1.6);
-      if (crownObj) crownObj.visible = false;
-
-      const glbHolder = new THREE.Group();
-      g.add(glbHolder);
-      const { mixer, actions } = normalizeAndAttachGlb(glbHolder, gltf, cfg.height);
-      enemyEntry.isGlb = true;
-      enemyEntry.mixer = mixer;
-      enemyEntry.actions = actions;
-      const walkAct = playAnimByKeywords(actions, ['walk', 'run', 'move', 'idle'], true);
-      if (walkAct) {
-        walkAct.play();
-        enemyEntry.activeAction = walkAct;
-      }
-    });
-  }
+    shootCD: rand(1.0, 2.0), flash: 0, phase: Math.random() * 6
+  });
 }
 
 function spawnFloatingText(pos3, text, color = '#fff') {
@@ -1563,47 +1414,31 @@ function updatePlay(dt) {
   heroGroup.rotation.y += yawDiff * Math.min(1, dt * 16);
 
   if (heroRig) {
-    if (heroRig.swingTimer > 0) heroRig.swingTimer = Math.max(0, heroRig.swingTimer - dt);
-
-    if (heroRig.isGlb && heroRig.mixer) {
-      let desiredAct = null;
-      if (heroRig.swingTimer > 0) {
-        desiredAct = playAnimByKeywords(heroRig.actions, ['attack', 'slash', 'swing', 'hit', 'spell', 'cast'], false);
-      }
-      if (!desiredAct && moving) {
-        desiredAct = playAnimByKeywords(heroRig.actions, ['run', 'walk', 'sprint', 'move'], false);
-      }
-      if (!desiredAct) {
-        desiredAct = playAnimByKeywords(heroRig.actions, ['idle', 'stand'], true);
-      }
-      switchMixerAction(heroRig, desiredAct, 0.12);
-      heroRig.mixer.update(dt);
+    if (moving) {
+      heroRig.walkPhase += dt * 15;
+      const swing = Math.sin(heroRig.walkPhase);
+      heroRig.legs[0].rotation.x = swing * 0.85;
+      heroRig.legs[1].rotation.x = -swing * 0.85;
+      heroRig.leftArm.rotation.x = -swing * 0.55;
+      heroRig.root.position.y = Math.abs(Math.cos(heroRig.walkPhase)) * 0.14;
+      heroRig.torso.rotation.z = Math.sin(heroRig.walkPhase) * 0.06;
+      heroRig.capePivot.rotation.x = 0.45 + Math.sin(heroRig.walkPhase * 2) * 0.12;
     } else {
-      if (moving) {
-        heroRig.walkPhase += dt * 15;
-        const swing = Math.sin(heroRig.walkPhase);
-        heroRig.legs[0].rotation.x = swing * 0.85;
-        heroRig.legs[1].rotation.x = -swing * 0.85;
-        heroRig.leftArm.rotation.x = -swing * 0.55;
-        heroRig.root.position.y = Math.abs(Math.cos(heroRig.walkPhase)) * 0.14;
-        heroRig.torso.rotation.z = Math.sin(heroRig.walkPhase) * 0.06;
-        heroRig.capePivot.rotation.x = 0.45 + Math.sin(heroRig.walkPhase * 2) * 0.12;
-      } else {
-        heroRig.legs.forEach(l => l.rotation.x *= 0.8);
-        heroRig.leftArm.rotation.x *= 0.8;
-        heroRig.root.position.y *= 0.8;
-        heroRig.torso.rotation.z *= 0.8;
-        heroRig.capePivot.rotation.x = 0.16 + Math.sin(state.time * 3) * 0.05;
-      }
+      heroRig.legs.forEach(l => l.rotation.x *= 0.8);
+      heroRig.leftArm.rotation.x *= 0.8;
+      heroRig.root.position.y *= 0.8;
+      heroRig.torso.rotation.z *= 0.8;
+      heroRig.capePivot.rotation.x = 0.16 + Math.sin(state.time * 3) * 0.05;
+    }
 
-      if (heroRig.swingTimer > 0) {
-        const t = 1 - heroRig.swingTimer / 0.24;
-        heroRig.rightArm.rotation.x = -1.3 + Math.sin(t * Math.PI) * 2.4;
-        heroRig.torso.rotation.y = Math.sin(t * Math.PI) * 0.35;
-      } else {
-        heroRig.rightArm.rotation.x = -0.35 + Math.sin(state.time * 4) * 0.08;
-        heroRig.torso.rotation.y *= 0.8;
-      }
+    if (heroRig.swingTimer > 0) {
+      heroRig.swingTimer -= dt;
+      const t = 1 - heroRig.swingTimer / 0.24;
+      heroRig.rightArm.rotation.x = -1.3 + Math.sin(t * Math.PI) * 2.4;
+      heroRig.torso.rotation.y = Math.sin(t * Math.PI) * 0.35;
+    } else {
+      heroRig.rightArm.rotation.x = -0.35 + Math.sin(state.time * 4) * 0.08;
+      heroRig.torso.rotation.y *= 0.8;
     }
   }
 
@@ -1716,19 +1551,13 @@ function updatePlay(dt) {
     }
     e.mesh.rotation.y = Math.atan2(dx, dz);
 
-    if (e.isGlb && e.mixer) {
-      const act = playAnimByKeywords(e.actions, ['walk', 'run', 'move', 'idle'], true);
-      switchMixerAction(e, act, 0.14);
-      e.mixer.update(dt);
-    } else {
-      e.phase += dt * (e.spd * 3.2);
-      const w = Math.sin(e.phase);
-      e.legs[0].rotation.x = w * 0.75;
-      e.legs[1].rotation.x = -w * 0.75;
-      e.torso.rotation.z = w * 0.08;
-      e.arms[0].rotation.z = Math.cos(e.phase) * 0.15;
-      e.arms[1].rotation.z = -Math.cos(e.phase) * 0.15;
-    }
+    e.phase += dt * (e.spd * 3.2);
+    const w = Math.sin(e.phase);
+    e.legs[0].rotation.x = w * 0.75;
+    e.legs[1].rotation.x = -w * 0.75;
+    e.torso.rotation.z = w * 0.08;
+    e.arms[0].rotation.z = Math.cos(e.phase) * 0.15;
+    e.arms[1].rotation.z = -Math.cos(e.phase) * 0.15;
 
     if (e.ranged) {
       e.shootCD -= dt;
@@ -1846,14 +1675,8 @@ function animate(now) {
       const a = now * 0.0005;
       heroGroup.rotation.y = a;
       if (heroRig) {
-        if (heroRig.isGlb && heroRig.mixer) {
-          const idleAct = playAnimByKeywords(heroRig.actions, ['idle', 'stand'], true);
-          switchMixerAction(heroRig, idleAct, 0.15);
-          heroRig.mixer.update(dt);
-        } else {
-          heroRig.root.position.y = Math.sin(now * 0.004) * 0.06;
-          heroRig.capePivot.rotation.x = 0.18 + Math.sin(now * 0.005) * 0.06;
-        }
+        heroRig.root.position.y = Math.sin(now * 0.004) * 0.06;
+        heroRig.capePivot.rotation.x = 0.18 + Math.sin(now * 0.005) * 0.06;
       }
       camera.position.set(Math.sin(a) * 11, 8.5, Math.cos(a) * 11);
       camera.lookAt(0, 1.2, 0);
