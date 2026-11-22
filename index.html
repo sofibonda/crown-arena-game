@@ -54,6 +54,8 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
 .btn-green{background:linear-gradient(180deg,#4ade80,#16a34a);color:#fff;box-shadow:0 5px 0 #15803d,0 8px 20px rgba(22,163,74,.35)}
 .btn-purple{background:linear-gradient(180deg,#c084fc,#9333ea);color:#fff;box-shadow:0 5px 0 #6b21a8,0 8px 20px rgba(147,51,234,.35)}
 .btn-sm{padding:9px 14px;font-size:14px;border-radius:12px}
+.btn-reset{background:rgba(15,23,42,.75);color:#fca5a5;border:1px solid rgba(248,113,113,.35);box-shadow:none;font-size:12px;padding:7px 12px;border-radius:10px}
+.btn-reset:hover{background:rgba(127,29,29,.45);color:#fff;transform:none;filter:none}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;filter:grayscale(.5)}
 
 .ad-badge{background:#111827;color:#fde047;font-size:11px;padding:2px 6px;border-radius:6px;letter-spacing:.5px}
@@ -224,6 +226,9 @@ h1{margin:0 0 6px;font-size:clamp(30px,6vw,44px);font-weight:700;background:line
       🎁 +150 GOLD <span class="ad-badge">BONUS</span>
     </button>
     <div style="margin-top:12px;font-size:12px;color:#94a3b8">WASD / Drag to move • Auto-Slash &amp; Homing Bolts • Space: Dash</div>
+    <div style="margin-top:10px;display:flex;justify-content:center">
+      <button class="btn btn-reset" id="btn-reset-save" title="Reset gold, upgrades, skins & records">🗑️ RESET PROGRESS</button>
+    </div>
   </div>
 </div>
 
@@ -375,11 +380,11 @@ const SWORD_TIERS = [
 ];
 
 const RARITY_DEF = {
-  common:    { label: 'Common',    cls: 'rarity-common',    weight: 42, mult: 0.85 },
-  uncommon:  { label: 'Uncommon',  cls: 'rarity-uncommon',  weight: 28, mult: 1.05 },
-  rare:      { label: 'Rare',      cls: 'rarity-rare',      weight: 17, mult: 1.3 },
-  epic:      { label: 'Epic',      cls: 'rarity-epic',      weight: 9,  mult: 1.65 },
-  legendary: { label: 'Legendary', cls: 'rarity-legendary', weight: 4,  mult: 2.15 }
+  common:    { label: 'Common',    cls: 'rarity-common',    weight: 54, mult: 0.88 },
+  uncommon:  { label: 'Uncommon',  cls: 'rarity-uncommon',  weight: 30, mult: 1.05 },
+  rare:      { label: 'Rare',      cls: 'rarity-rare',      weight: 12.5, mult: 1.28 },
+  epic:      { label: 'Epic',      cls: 'rarity-epic',      weight: 2.8, mult: 1.6 },
+  legendary: { label: 'Legendary', cls: 'rarity-legendary', weight: 0.7, mult: 2.05 }
 };
 
 let save = {
@@ -730,7 +735,6 @@ const RUN_POWERS = [
 
 function rollRarity(baseRarity) {
   const keys = Object.keys(RARITY_DEF);
-  const baseIdx = Math.max(0, keys.indexOf(baseRarity || 'common'));
   const totalW = keys.reduce((acc, k) => acc + RARITY_DEF[k].weight, 0);
   let r = Math.random() * totalW;
   let pickedIdx = 0;
@@ -738,7 +742,13 @@ function rollRarity(baseRarity) {
     r -= RARITY_DEF[keys[i]].weight;
     if (r <= 0) { pickedIdx = i; break; }
   }
-  const finalIdx = clamp(Math.round((pickedIdx + baseIdx) / 2), 0, keys.length - 1);
+  // Slight nudge from baseRarity without inflating Epic/Legendary odds
+  const baseIdx = Math.max(0, keys.indexOf(baseRarity || 'common'));
+  let finalIdx = pickedIdx;
+  if (pickedIdx === 0 && baseIdx >= 1 && Math.random() < 0.35) finalIdx = 1;
+  if (pickedIdx === 1 && baseIdx >= 2 && Math.random() < 0.25) finalIdx = 2;
+  // Cap high rarity unless genuinely rolled
+  if (finalIdx >= 3 && pickedIdx < 3) finalIdx = Math.min(finalIdx, 2);
   const key = keys[finalIdx];
   return { key, ...RARITY_DEF[key] };
 }
@@ -835,6 +845,27 @@ $('btn-close-upg').onclick = () => { $('ov-upg').style.display = 'none'; };
 $('btn-open-skins').onclick = () => { AudioSys.init(); renderSkinsModal(); $('ov-skins').style.display = 'flex'; };
 $('btn-close-skins').onclick = () => { $('ov-skins').style.display = 'none'; };
 
+
+$('btn-reset-save').onclick = () => {
+  AudioSys.init();
+  if (!confirm('Reset all gold, upgrades, unlocked heroes, and records?')) return;
+  save = {
+    gold: 100,
+    bestTime: 0,
+    bestKills: 0,
+    upg: { hp: 0, dmg: 0, spd: 0, mag: 0, greed: 0, armor: 0 },
+    skins: ['knight'],
+    skin: 'knight',
+    muted: AudioSys.muted
+  };
+  try { localStorage.removeItem('crown_arena_save_v2'); } catch (_) {}
+  saveProgress();
+  buildHeroModel();
+  updateSwordVisuals();
+  refreshLobbyUI();
+  AudioSys.hit();
+};
+
 $('btn-free-gold').onclick = () => {
   AudioSys.init();
   save.gold += 150;
@@ -887,29 +918,29 @@ function startRun() {
   state.kills = 0;
   state.runGold = 0;
   state.xp = 0;
-  state.xpNext = 20;
+  state.xpNext = 22;
   state.lvl = 1;
   state.swordEvo = 0;
 
   state.maxHp = 100 + (save.upg.hp || 0) * 25;
   state.hp = state.maxHp;
-  state.damage = Math.round(24 * (1 + (save.upg.dmg || 0) * 0.16));
-  state.speed = 8.0 * (1 + (save.upg.spd || 0) * 0.06);
-  state.magnet = 4.0 * (1 + (save.upg.mag || 0) * 0.20);
-  state.fireRate = 0.44;
+  state.damage = Math.round(22 * (1 + (save.upg.dmg || 0) * 0.15));
+  state.speed = 7.8 * (1 + (save.upg.spd || 0) * 0.06);
+  state.magnet = 3.8 * (1 + (save.upg.mag || 0) * 0.20);
+  state.fireRate = 0.48;
   state.fireTimer = 0;
   state.slashTimer = 0;
   state.multishot = 1;
   state.blades = 0;
   state.lightning = 0;
   state.lightningTimer = 0;
-  state.critChance = 0.15;
+  state.critChance = 0.12;
   state.dashCD = 0;
   state.dashTime = 0;
   state.hurtCD = 0;
   state.revived = false;
   state.doubled = false;
-  state.nextBossTime = 55;
+  state.nextBossTime = 50;
   state.shake = 0;
 
   heroGroup.position.set(0, 0, 0);
@@ -1108,15 +1139,15 @@ function spawnEnemy(type, customDist = ARENA_R - 1.5) {
   const x = Math.cos(angle) * customDist;
   const z = Math.sin(angle) * customDist;
 
-  const waveMult = 1 + state.time / 75;
-  let cfg = { hp: 24 * waveMult, spd: 3.3, dmg: 11, rad: 0.55, col: 0x22c55e, xp: 7, gold: 2, isBoss: false, ranged: false, scale: 1 };
+  const waveMult = 1 + state.time / 60;
+  let cfg = { hp: 26 * waveMult, spd: 3.4, dmg: 12, rad: 0.55, col: 0x22c55e, xp: 6, gold: 2, isBoss: false, ranged: false, scale: 1 };
 
   if (type === 'brute') {
-    cfg = { hp: 72 * waveMult, spd: 2.3, dmg: 18, rad: 0.85, col: 0xf97316, xp: 18, gold: 5, isBoss: false, ranged: false, scale: 1.45 };
+    cfg = { hp: 78 * waveMult, spd: 2.35, dmg: 20, rad: 0.85, col: 0xf97316, xp: 16, gold: 5, isBoss: false, ranged: false, scale: 1.45 };
   } else if (type === 'imp') {
-    cfg = { hp: 32 * waveMult, spd: 2.85, dmg: 15, rad: 0.58, col: 0xa855f7, xp: 11, gold: 4, isBoss: false, ranged: true, scale: 1.05 };
+    cfg = { hp: 34 * waveMult, spd: 2.9, dmg: 16, rad: 0.58, col: 0xa855f7, xp: 10, gold: 4, isBoss: false, ranged: true, scale: 1.05 };
   } else if (type === 'boss') {
-    cfg = { hp: 540 * waveMult, spd: 2.4, dmg: 24, rad: 1.5, col: 0xef4444, xp: 110, gold: 55, isBoss: true, ranged: true, scale: 2.35 };
+    cfg = { hp: 580 * waveMult, spd: 2.45, dmg: 26, rad: 1.5, col: 0xef4444, xp: 95, gold: 50, isBoss: true, ranged: true, scale: 2.35 };
   }
 
   const g = new THREE.Group();
@@ -1295,7 +1326,7 @@ function performAttack(nearest) {
         const dot = d > 0.01 ? v.normalize().dot(dir) : 1;
         if (dot > 0.15) {
           const crit = Math.random() < state.critChance;
-          const dmg = Math.round(state.damage * (1.15 + (swordInfo.tier - 1) * 0.08) * (crit ? 2.2 : 1));
+          const dmg = Math.round(state.damage * (1.15 + (swordInfo.tier - 1) * 0.05) * (crit ? 2.2 : 1));
           damageEnemy(e, dmg, crit, dir);
         }
       }
@@ -1450,10 +1481,10 @@ function updatePlay(dt) {
 
   spawnTimer -= dt;
   if (spawnTimer <= 0) {
-    spawnTimer = Math.max(0.38, 1.35 - state.time * 0.007);
+    spawnTimer = Math.max(0.35, 1.3 - state.time * 0.008);
     const roll = Math.random();
-    if (state.time > 8 && roll < 0.30) spawnEnemy('imp');
-    else if (state.time > 5 && roll < 0.52) spawnEnemy('brute');
+    if (state.time > 8 && roll < 0.32) spawnEnemy('imp');
+    else if (state.time > 5 && roll < 0.55) spawnEnemy('brute');
     else spawnEnemy('goblin');
   }
   if (state.time >= state.nextBossTime) {
@@ -1594,7 +1625,7 @@ function updatePlay(dt) {
         if (state.xp >= state.xpNext) {
           state.xp -= state.xpNext;
           state.lvl++;
-          state.xpNext = Math.round(state.xpNext * 1.24 + 9);
+          state.xpNext = Math.round(state.xpNext * 1.28 + 10);
           scene.remove(g.mesh);
           gems.splice(i, 1);
           triggerLevelUp();
